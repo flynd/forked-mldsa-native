@@ -296,21 +296,7 @@ void mld_polyvecl_pointwise_acc_montgomery(mld_poly *w, const mld_polyvecl *u,
       t += (int64_t)u->vec[j].coeffs[i] * v->vec[j].coeffs[i];
     }
 
-    /* Substitute j == MLSDA_L into the loop invariant to get... */
-    cassert(j == MLDSA_L);
-    cassert(t >= -(int64_t)MLDSA_L * (MLDSA_Q - 1) * (MLD_NTT_BOUND - 1));
-    cassert(t <= (int64_t)MLDSA_L * (MLDSA_Q - 1) * (MLD_NTT_BOUND - 1));
-
-    /* ...and therefore... */
-    cassert(t >= -MONTGOMERY_REDUCE_STRONG_DOMAIN_MAX);
-    cassert(t < MONTGOMERY_REDUCE_STRONG_DOMAIN_MAX);
-
-    /* ...which meets the "strong" case of mld_montgomery_reduce() */
     r = mld_montgomery_reduce(t);
-
-    /* ...and therefore we can assert a stronger bound on r */
-    cassert(r > -MLDSA_Q);
-    cassert(r < MLDSA_Q);
     w->coeffs[i] = r;
   }
 

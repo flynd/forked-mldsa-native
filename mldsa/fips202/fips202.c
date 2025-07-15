@@ -29,7 +29,6 @@ __contract__(
 )
 {
   mld_memset(s, 0, sizeof(uint64_t) * MLD_KECCAK_LANES);
-  cassert(forall(k, 0, MLD_KECCAK_LANES, s[k] == 0));
 }
 
 /*************************************************
@@ -187,7 +186,6 @@ __contract__(
   assigns(memory_slice(s, sizeof(uint64_t) * MLD_KECCAK_LANES)))
 {
   mld_memset(s, 0, sizeof(uint64_t) * MLD_KECCAK_LANES);
-  cassert(forall(k, 0, MLD_KECCAK_LANES, s[k] == 0));
 
   while (inlen >= r)
   __loop__(

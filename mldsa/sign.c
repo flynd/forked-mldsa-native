@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "cbmc.h"
+#include "debug.h"
 #include "fips202/fips202.h"
 #include "packing.h"
 #include "poly.h"
@@ -371,9 +372,7 @@ __contract__(
   /* If z is valid, then its coefficients are bounded by  */
   /* MLDSA_GAMMA1 - MLDSA_BETA. This will be needed below */
   /* to prove the pre-condition of pack_sig()             */
-  cassert(forall(k1, 0, MLDSA_L,
-                 array_abs_bound(z.vec[k1].coeffs, 0, MLDSA_N,
-                                 (MLDSA_GAMMA1 - MLDSA_BETA))));
+  mld_assert_abs_bound_2d(z.vec, MLDSA_L, MLDSA_N, (MLDSA_GAMMA1 - MLDSA_BETA));
 
   /* Check that subtracting cs2 does not change high bits of w and low bits
    * do not reveal secret information */

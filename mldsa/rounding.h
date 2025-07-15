@@ -9,6 +9,7 @@
 #include "cbmc.h"
 #include "common.h"
 #include "ct.h"
+#include "debug.h"
 
 #define MLD_2_POW_D (1 << MLDSA_D)
 
@@ -74,20 +75,20 @@ __contract__(
 {
   *a1 = (a + 127) >> 7;
   /* We know a >= 0 and a < MLDSA_Q, so... */
-  cassert(*a1 >= 0 && *a1 <= 65472);
+  mld_assert(*a1 >= 0 && *a1 <= 65472);
 
 #if MLDSA_MODE == 2
   *a1 = (*a1 * 11275 + (1 << 23)) >> 24;
-  cassert(*a1 >= 0 && *a1 <= 44);
+  mld_assert(*a1 >= 0 && *a1 <= 44);
 
   *a1 = mld_ct_sel_int32(0, *a1, mld_ct_cmask_neg_i32(43 - *a1));
-  cassert(*a1 >= 0 && *a1 <= 43);
+  mld_assert(*a1 >= 0 && *a1 <= 43);
 #else /* MLDSA_MODE == 2 */
   *a1 = (*a1 * 1025 + (1 << 21)) >> 22;
-  cassert(*a1 >= 0 && *a1 <= 16);
+  mld_assert(*a1 >= 0 && *a1 <= 16);
 
   *a1 &= 15;
-  cassert(*a1 >= 0 && *a1 <= 15);
+  mld_assert(*a1 >= 0 && *a1 <= 15);
 
 #endif /* MLDSA_MODE != 2 */
 

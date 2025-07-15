@@ -9,6 +9,7 @@
 #include "cbmc.h"
 #include "common.h"
 #include "ct.h"
+#include "debug.h"
 
 #define MONT -4186625 /* 2^32 % MLDSA_Q */
 
@@ -130,7 +131,7 @@ __contract__(
 
   t = (a + (1 << 22)) >> 23;
   t = a - t * MLDSA_Q;
-  cassert((t - a) % MLDSA_Q == 0);
+  mld_assert((t - a) % MLDSA_Q == 0);
   return t;
 }
 

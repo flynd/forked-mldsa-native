@@ -153,16 +153,23 @@
  *              void *mld_memset(void *s, int c, size_t n)
  *
  *****************************************************************************/
-/* #define MLD_CONFIG_CUSTOM_MEMSET
-   #if !defined(__ASSEMBLER__)
-   #include <stdint.h>
-   #include "sys.h"
-   static MLD_INLINE void *mld_memset(void *s, int c, size_t n)
-   {
-       ... your implementation ...
-   }
-   #endif
-*/
+#define MLD_CONFIG_CUSTOM_MEMSET
+#if !defined(__ASSEMBLER__)
+#include <stddef.h>
+#include <stdint.h>
+#include "../mldsa/sys.h"
+static MLD_INLINE void *mld_memset(void *s, int c, size_t n)
+{
+  /* Simple byte-by-byte set implementation for testing */
+  unsigned char *ptr = (unsigned char *)s;
+  for (size_t i = 0; i < n; i++)
+  {
+    ptr[i] = (unsigned char)c;
+  }
+  return s;
+}
+#endif
+
 
 /******************************************************************************
  * Name:        MLD_CONFIG_KEYGEN_PCT

@@ -130,16 +130,24 @@
  *              void *mld_memcpy(void *dest, const void *src, size_t n)
  *
  *****************************************************************************/
-/* #define MLD_CONFIG_CUSTOM_MEMCPY
-   #if !defined(__ASSEMBLER__)
-   #include <stdint.h>
-   #include "sys.h"
-   static MLD_INLINE void *mld_memcpy(void *dest, const void *src, size_t n)
-   {
-       ... your implementation ...
-   }
-   #endif
-*/
+#define MLD_CONFIG_CUSTOM_MEMCPY
+#if !defined(__ASSEMBLER__)
+#include <stddef.h>
+#include <stdint.h>
+#include "../mldsa/sys.h"
+static MLD_INLINE void *mld_memcpy(void *dest, const void *src, size_t n)
+{
+  /* Simple byte-by-byte copy implementation for testing */
+  unsigned char *d = (unsigned char *)dest;
+  const unsigned char *s = (const unsigned char *)src;
+  for (size_t i = 0; i < n; i++)
+  {
+    d[i] = s[i];
+  }
+  return dest;
+}
+#endif /* !__ASSEMBLER__ */
+
 
 /******************************************************************************
  * Name:        MLD_CONFIG_CUSTOM_MEMSET

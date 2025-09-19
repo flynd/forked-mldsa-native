@@ -298,4 +298,22 @@ static MLD_INLINE void mld_polyz_unpack_17_native(int32_t *r, const uint8_t *a);
 static MLD_INLINE void mld_polyz_unpack_19_native(int32_t *r, const uint8_t *a);
 #endif /* MLD_USE_NATIVE_POLYZ_UNPACK_19 */
 
+#if defined(MLD_USE_NATIVE_POINTWISE_MONTGOMERY)
+/*************************************************
+ * Name:        mld_poly_pointwise_montgomery_native
+ *
+ * Description: Pointwise multiplication of polynomials in NTT domain
+ *              with Montgomery reduction.
+ *
+ *              Computes c[i] = a[i] * b[i] * R^(-1) mod q for all i,
+ *              where R = 2^32.
+ *
+ * Arguments:   - int32_t c[MLDSA_N]: output polynomial
+ *              - const int32_t a[MLDSA_N]: first input polynomial
+ *              - const int32_t b[MLDSA_N]: second input polynomial
+ **************************************************/
+static MLD_INLINE void mld_poly_pointwise_montgomery_native(
+    int32_t c[MLDSA_N], const int32_t a[MLDSA_N], const int32_t b[MLDSA_N]);
+#endif /* MLD_USE_NATIVE_POINTWISE_MONTGOMERY */
+
 #endif /* !MLD_NATIVE_API_H */

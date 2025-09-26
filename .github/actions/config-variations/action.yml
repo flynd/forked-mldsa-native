@@ -1,0 +1,118 @@
+# SPDX-License-Identifier: Apache-2.0 OR ISC OR MIT
+
+name: 'Custom config tests'
+description: 'Build and test mldsa-native with various custom configs'
+inputs:
+  gh_token:
+    description: 'GitHub token'
+    required: true
+  tests:
+    description: 'List of tests to run (space-separated IDs) or "all" for all tests. Available IDs: pct-enabled, pct-enabled-broken, custom-zeroize, no-asm, custom-randombytes, custom-memcpy, custom-memset, custom-stdlib'
+    required: false
+    default: 'all'
+  opt:
+    description: 'Optimization level to pass to multi-functest'
+    required: false
+    default: 'all'
+runs:
+  using: 'composite'
+  steps:
+    - name: "PCT enabled"
+      if: ${{ inputs.tests == 'all' || contains(inputs.tests, 'pct-enabled') }}
+      uses: ./.github/actions/multi-functest
+      with:
+        gh_token: ${{ inputs.gh_token }}
+        compile_mode: native
+        cflags: "-DMLD_CONFIG_KEYGEN_PCT -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all"
+        func: true
+        kat: true
+        acvp: true
+        opt: ${{ inputs.opt }}
+        examples: true
+    - name: "PCT enabled + broken"
+      if: ${{ inputs.tests == 'all' || contains(inputs.tests, 'pct-enabled-broken') }}
+      shell: bash
+      run: |
+        make clean
+        CFLAGS='-DMLD_CONFIG_FILE=\"../test/break_pct_config.h\"' make func -j4
+        # PCT breakage is done at runtime via MLD_BREAK_PCT
+        make run_func                 # Should be OK
+        MLD_BREAK_PCT=0 make run_func # Should be OK
+        if (MLD_BREAK_PCT=1 make run_func 2>&1 >/dev/null); then
+           echo "PCT failure expected"
+           exit 1
+        else
+           echo "PCT failed as expected"
+        fi
+    - name: "Custom zeroization (explicit_bzero)"
+      if: ${{ inputs.tests == 'all' || contains(inputs.tests, 'custom-zeroize') }}
+      uses: ./.github/actions/multi-functest
+      with:
+        gh_token: ${{ inputs.gh_token }}
+        compile_mode: native
+        cflags: "-std=c11 -D_GNU_SOURCE -DMLD_CONFIG_FILE=\\\\\\\"../test/custom_zeroize_config.h\\\\\\\" -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all"
+        func: true
+        kat: true
+        acvp: true
+        opt: ${{ inputs.opt }}
+        examples: false # Some examples use a custom config themselves
+    - name: "No ASM"
+      if: ${{ inputs.tests == 'all' || contains(inputs.tests, 'no-asm') }}
+      uses: ./.github/actions/multi-functest
+      with:
+        gh_token: ${{ inputs.gh_token }}
+        compile_mode: native
+        cflags: "-std=c11 -D_GNU_SOURCE -DMLD_CONFIG_FILE=\\\\\\\"../test/no_asm_config.h\\\\\\\" -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all"
+        func: true
+        kat: true
+        acvp: true
+        opt: ${{ inputs.opt }}
+        examples: false # Some examples use a custom config themselves
+    - name: "Custom randombytes"
+      if: ${{ inputs.tests == 'all' || contains(inputs.tests, 'custom-randombytes') }}
+      uses: ./.github/actions/multi-functest
+      with:
+        gh_token: ${{ inputs.gh_token }}
+        compile_mode: native
+        cflags: "-std=c11 -D_GNU_SOURCE -DMLD_CONFIG_FILE=\\\\\\\"../test/custom_randombytes_config.h\\\\\\\" -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all"
+        func: true
+        kat: true
+        acvp: true
+        opt: ${{ inputs.opt }}
+        examples: false # Some examples use a custom config themselves
+    - name: "Custom memcpy"
+      if: ${{ inputs.tests == 'all' || contains(inputs.tests, 'custom-memcpy') }}
+      uses: ./.github/actions/multi-functest
+      with:
+        gh_token: ${{ inputs.gh_token }}
+        compile_mode: native
+        cflags: "-std=c11 -D_GNU_SOURCE -DMLD_CONFIG_FILE=\\\\\\\"../test/custom_memcpy_config.h\\\\\\\" -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all"
+        func: true
+        kat: true
+        acvp: true
+        opt: ${{ inputs.opt }}
+        examples: false # Some examples use a custom config themselves
+    - name: "Custom memset"
+      if: ${{ inputs.tests == 'all' || contains(inputs.tests, 'custom-memset') }}
+      uses: ./.github/actions/multi-functest
+      with:
+        gh_token: ${{ inputs.gh_token }}
+        compile_mode: native
+        cflags: "-std=c11 -D_GNU_SOURCE -DMLD_CONFIG_FILE=\\\\\\\"../test/custom_memset_config.h\\\\\\\" -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all"
+        func: true
+        kat: true
+        acvp: true
+        opt: ${{ inputs.opt }}
+        examples: false # Some examples use a custom config themselves
+    - name: "Custom stdlib (memcpy + memset)"
+      if: ${{ inputs.tests == 'all' || contains(inputs.tests, 'custom-stdlib') }}
+      uses: ./.github/actions/multi-functest
+      with:
+        gh_token: ${{ inputs.gh_token }}
+        compile_mode: native
+        cflags: "-std=c11 -D_GNU_SOURCE -DMLD_CONFIG_FILE=\\\\\\\"../test/custom_stdlib_config.h\\\\\\\" -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all"
+        func: true
+        kat: true
+        acvp: true
+        opt: ${{ inputs.opt }}
+        examples: false # Some examples use a custom config themselves

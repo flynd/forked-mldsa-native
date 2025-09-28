@@ -31,6 +31,7 @@
 #include "packing.h"
 #include "poly.h"
 #include "polyvec.h"
+#include "prehash.h"
 #include "randombytes.h"
 #include "sign.h"
 #include "symmetric.h"
@@ -861,4 +862,70 @@ badsig:
   }
 
   return -1;
+}
+
+
+MLD_MUST_CHECK_RETURN_VALUE
+MLD_EXTERNAL_API
+int crypto_sign_signature_pre_hash_internal(uint8_t *sig, size_t *siglen,
+                                            const uint8_t *ph, size_t phlen,
+                                            const uint8_t *ctx, size_t ctxlen,
+                                            const uint8_t rnd[MLDSA_RNDBYTES],
+                                            const uint8_t *sk,
+                                            mld_hash_alg_t hashAlg)
+{
+  MLD_ALIGN uint8_t fmsg[MLD_PRE_HASH_MAX_FORMATTED_MESSAGE_BYTES];
+  size_t fmsg_len;
+  int result;
+
+  if (ctxlen > 255)
+  {
+    *siglen = 0;
+    return -1;
+  }
+
+  if (mld_validate_hash_length(hashAlg, phlen))
+  {
+    *siglen = 0;
+    return -1;
+  }
+
+  fmsg_len = mld_format_pre_hash_message(fmsg, ph, phlen, ctx, ctxlen, hashAlg);
+
+  result = crypto_sign_signature_internal(sig, siglen, fmsg, fmsg_len, NULL, 0,
+                                          rnd, sk, 0);
+  /* @[FIPS204, Section 3.6.3] Destruction of intermediate values. */
+  mld_zeroize(fmsg, sizeof(fmsg));
+  return result;
+}
+
+MLD_MUST_CHECK_RETURN_VALUE
+MLD_EXTERNAL_API
+int crypto_sign_verify_pre_hash_internal(const uint8_t *sig, size_t siglen,
+                                         const uint8_t *ph, size_t phlen,
+                                         const uint8_t *ctx, size_t ctxlen,
+                                         const uint8_t *pk,
+                                         mld_hash_alg_t hashAlg)
+{
+  MLD_ALIGN uint8_t fmsg[MLD_PRE_HASH_MAX_FORMATTED_MESSAGE_BYTES];
+  size_t fmsg_len;
+  int result;
+
+  if (ctxlen > 255)
+  {
+    return -1;
+  }
+
+  if (mld_validate_hash_length(hashAlg, phlen))
+  {
+    return -1;
+  }
+
+  fmsg_len = mld_format_pre_hash_message(fmsg, ph, phlen, ctx, ctxlen, hashAlg);
+
+  result =
+      crypto_sign_verify_internal(sig, siglen, fmsg, fmsg_len, NULL, 0, pk, 0);
+  /* @[FIPS204, Section 3.6.3] Destruction of intermediate values. */
+  mld_zeroize(fmsg, sizeof(fmsg));
+  return result;
 }

@@ -23,177 +23,212 @@ typedef struct
 {
   uint64_t s[MLD_KECCAK_LANES];
   unsigned int pos;
-} keccak_state;
+} mld_shake128ctx;
 
-#define KeccakF_RoundConstants FIPS202_NAMESPACE(KeccakF_RoundConstants)
-extern const uint64_t KeccakF_RoundConstants[];
+typedef struct
+{
+  uint64_t s[MLD_KECCAK_LANES];
+  unsigned int pos;
+} mld_shake256ctx;
 
-#define shake128_init FIPS202_NAMESPACE(shake128_init)
-void shake128_init(keccak_state *state)
+#define mld_shake128_init FIPS202_NAMESPACE(shake128_init)
+/*************************************************
+ * Name:        mld_shake128_init
+ *
+ * Description: Initializes state for use as SHAKE128 XOF
+ *
+ * Arguments:   - mld_shake128ctx *state: pointer to (uninitialized) state
+ **************************************************/
+void mld_shake128_init(mld_shake128ctx *state)
 __contract__(
-  requires(memory_no_alias(state, sizeof(keccak_state)))
-  assigns(memory_slice(state, sizeof(keccak_state)))
+  requires(memory_no_alias(state, sizeof(mld_shake128ctx)))
+  assigns(memory_slice(state, sizeof(mld_shake128ctx)))
   ensures(state->pos == 0)
 );
 
-#define shake128_absorb FIPS202_NAMESPACE(shake128_absorb)
-void shake128_absorb(keccak_state *state, const uint8_t *in, size_t inlen)
+#define mld_shake128_absorb FIPS202_NAMESPACE(shake128_absorb)
+/*************************************************
+ * Name:        mld_shake128_absorb
+ *
+ * Description: Absorb step of the SHAKE128 XOF. Absorbs arbitrarily many bytes.
+ *              Can be called multiple times to absorb multiple chunks of data.
+ *
+ * Arguments:   - mld_shake128ctx *state: pointer to (initialized) output state
+ *              - const uint8_t *in: pointer to input to be absorbed into s
+ *              - size_t inlen: length of input in bytes
+ **************************************************/
+void mld_shake128_absorb(mld_shake128ctx *state, const uint8_t *in,
+                         size_t inlen)
 __contract__(
   requires(inlen <= MLD_MAX_BUFFER_SIZE)
-  requires(memory_no_alias(state, sizeof(keccak_state)))
+  requires(memory_no_alias(state, sizeof(mld_shake128ctx)))
   requires(memory_no_alias(in, inlen))
   requires(state->pos <= SHAKE128_RATE)
-  assigns(memory_slice(state, sizeof(keccak_state)))
+  assigns(memory_slice(state, sizeof(mld_shake128ctx)))
   ensures(state->pos <= SHAKE128_RATE)
 );
 
-#define shake128_finalize FIPS202_NAMESPACE(shake128_finalize)
-void shake128_finalize(keccak_state *state)
+#define mld_shake128_finalize FIPS202_NAMESPACE(shake128_finalize)
+/*************************************************
+ * Name:        mld_shake128_finalize
+ *
+ * Description: Concludes the absorb phase of the SHAKE128 XOF.
+ *
+ * Arguments:   - mld_shake128ctx *state: pointer to state
+ **************************************************/
+void mld_shake128_finalize(mld_shake128ctx *state)
 __contract__(
-  requires(memory_no_alias(state, sizeof(keccak_state)))
+  requires(memory_no_alias(state, sizeof(mld_shake128ctx)))
   requires(state->pos <= SHAKE128_RATE)
-  assigns(memory_slice(state, sizeof(keccak_state)))
+  assigns(memory_slice(state, sizeof(mld_shake128ctx)))
   ensures(state->pos <= SHAKE128_RATE)
 );
 
-#define shake128_squeeze FIPS202_NAMESPACE(shake128_squeeze)
-void shake128_squeeze(uint8_t *out, size_t outlen, keccak_state *state)
+#define mld_shake128_squeeze FIPS202_NAMESPACE(shake128_squeeze)
+/*************************************************
+ * Name:        mld_shake128_squeeze
+ *
+ * Description: Squeeze step of SHAKE128 XOF. Squeezes arbitrarily many
+ *              bytes. Can be called multiple times to keep squeezing.
+ *
+ * Arguments:   - uint8_t *out: pointer to output blocks
+ *              - size_t outlen : number of bytes to be squeezed (written to
+ *output)
+ *              - mld_shake128ctx *s: pointer to input/output state
+ **************************************************/
+void mld_shake128_squeeze(uint8_t *out, size_t outlen, mld_shake128ctx *state)
 __contract__(
   requires(outlen <= 8 * SHAKE128_RATE /* somewhat arbitrary bound */)
-  requires(memory_no_alias(state, sizeof(keccak_state)))
+  requires(memory_no_alias(state, sizeof(mld_shake128ctx)))
   requires(memory_no_alias(out, outlen))
   requires(state->pos <= SHAKE128_RATE)
-  assigns(memory_slice(state, sizeof(keccak_state)))
+  assigns(memory_slice(state, sizeof(mld_shake128ctx)))
   assigns(memory_slice(out, outlen))
   ensures(state->pos <= SHAKE128_RATE)
 );
 
-#define shake128_absorb_once FIPS202_NAMESPACE(shake128_absorb_once)
-void shake128_absorb_once(keccak_state *state, const uint8_t *in, size_t inlen)
+#define mld_shake128_release FIPS202_NAMESPACE(shake128_release)
+/*************************************************
+ * Name:        mld_shake128_release
+ *
+ * Description: Release and securely zero the SHAKE128 state.
+ *
+ * Arguments:   - mld_shake128ctx *state: pointer to state
+ **************************************************/
+void mld_shake128_release(mld_shake128ctx *state)
 __contract__(
-  requires(inlen <= MLD_MAX_BUFFER_SIZE)
-  requires(memory_no_alias(state, sizeof(keccak_state)))
-  requires(memory_no_alias(in, inlen))
-  assigns(memory_slice(state, sizeof(keccak_state)))
-  ensures(state->pos == SHAKE128_RATE)
+  requires(memory_no_alias(state, sizeof(mld_shake128ctx)))
+  assigns(memory_slice(state, sizeof(mld_shake128ctx)))
 );
 
-#define shake128_squeezeblocks FIPS202_NAMESPACE(shake128_squeezeblocks)
-void shake128_squeezeblocks(uint8_t *out, size_t nblocks, keccak_state *state)
+#define mld_shake256_init FIPS202_NAMESPACE(shake256_init)
+/*************************************************
+ * Name:        mld_shake256_init
+ *
+ * Description: Initializes state for use as SHAKE256 XOF
+ *
+ * Arguments:   - mld_shake256ctx *state: pointer to (uninitialized) state
+ **************************************************/
+void mld_shake256_init(mld_shake256ctx *state)
 __contract__(
-  requires(nblocks <= 8 /* somewhat arbitrary bound */)
-  requires(memory_no_alias(state, sizeof(keccak_state)))
-  requires(memory_no_alias(out, nblocks * SHAKE128_RATE))
-  requires(state->pos <= SHAKE128_RATE)
-  assigns(memory_slice(state, sizeof(keccak_state)))
-  assigns(memory_slice(out, nblocks * SHAKE128_RATE))
-  ensures(state->pos <= SHAKE128_RATE)
-);
-
-#define shake128_release FIPS202_NAMESPACE(shake128_release)
-void shake128_release(keccak_state *state);
-
-#define shake256_init FIPS202_NAMESPACE(shake256_init)
-void shake256_init(keccak_state *state)
-__contract__(
-  requires(memory_no_alias(state, sizeof(keccak_state)))
-  assigns(memory_slice(state, sizeof(keccak_state)))
+  requires(memory_no_alias(state, sizeof(mld_shake256ctx)))
+  assigns(memory_slice(state, sizeof(mld_shake256ctx)))
   ensures(state->pos == 0)
 );
 
-#define shake256_absorb FIPS202_NAMESPACE(shake256_absorb)
-void shake256_absorb(keccak_state *state, const uint8_t *in, size_t inlen)
+#define mld_shake256_absorb FIPS202_NAMESPACE(shake256_absorb)
+/*************************************************
+ * Name:        mld_shake256_absorb
+ *
+ * Description: Absorb step of the SHAKE256 XOF. Absorbs arbitrarily many bytes.
+ *              Can be called multiple times to absorb multiple chunks of data.
+ *
+ * Arguments:   - mld_shake256ctx *state: pointer to (initialized) output state
+ *              - const uint8_t *in: pointer to input to be absorbed into s
+ *              - size_t inlen: length of input in bytes
+ **************************************************/
+void mld_shake256_absorb(mld_shake256ctx *state, const uint8_t *in,
+                         size_t inlen)
 __contract__(
   requires(inlen <= MLD_MAX_BUFFER_SIZE)
-  requires(memory_no_alias(state, sizeof(keccak_state)))
+  requires(memory_no_alias(state, sizeof(mld_shake256ctx)))
   requires(memory_no_alias(in, inlen))
   requires(state->pos <= SHAKE256_RATE)
-  assigns(memory_slice(state, sizeof(keccak_state)))
+  assigns(memory_slice(state, sizeof(mld_shake256ctx)))
   ensures(state->pos <= SHAKE256_RATE)
 );
 
-#define shake256_finalize FIPS202_NAMESPACE(shake256_finalize)
-void shake256_finalize(keccak_state *state)
+#define mld_shake256_finalize FIPS202_NAMESPACE(shake256_finalize)
+/*************************************************
+ * Name:        mld_shake256_finalize
+ *
+ * Description: Concludes the absorb phase of the SHAKE256 XOF.
+ *
+ * Arguments:   - mld_shake256ctx *state: pointer to state
+ **************************************************/
+void mld_shake256_finalize(mld_shake256ctx *state)
 __contract__(
-  requires(memory_no_alias(state, sizeof(keccak_state)))
+  requires(memory_no_alias(state, sizeof(mld_shake256ctx)))
   requires(state->pos <= SHAKE256_RATE)
-  assigns(memory_slice(state, sizeof(keccak_state)))
+  assigns(memory_slice(state, sizeof(mld_shake256ctx)))
   ensures(state->pos <= SHAKE256_RATE)
 );
 
-#define shake256_squeeze FIPS202_NAMESPACE(shake256_squeeze)
-void shake256_squeeze(uint8_t *out, size_t outlen, keccak_state *state)
+#define mld_shake256_squeeze FIPS202_NAMESPACE(shake256_squeeze)
+/*************************************************
+ * Name:        mld_shake256_squeeze
+ *
+ * Description: Squeeze step of SHAKE256 XOF. Squeezes arbitrarily many
+ *              bytes. Can be called multiple times to keep squeezing.
+ *
+ * Arguments:   - uint8_t *out: pointer to output blocks
+ *              - size_t outlen : number of bytes to be squeezed (written to
+ *output)
+ *              - mld_shake256ctx *s: pointer to input/output state
+ **************************************************/
+void mld_shake256_squeeze(uint8_t *out, size_t outlen, mld_shake256ctx *state)
 __contract__(
   requires(outlen <= 8 * SHAKE256_RATE /* somewhat arbitrary bound */)
-  requires(memory_no_alias(state, sizeof(keccak_state)))
+  requires(memory_no_alias(state, sizeof(mld_shake256ctx)))
   requires(memory_no_alias(out, outlen))
   requires(state->pos <= SHAKE256_RATE)
-  assigns(memory_slice(state, sizeof(keccak_state)))
+  assigns(memory_slice(state, sizeof(mld_shake256ctx)))
   assigns(memory_slice(out, outlen))
   ensures(state->pos <= SHAKE256_RATE)
 );
 
-#define shake256_absorb_once FIPS202_NAMESPACE(shake256_absorb_once)
-void shake256_absorb_once(keccak_state *state, const uint8_t *in, size_t inlen)
+#define mld_shake256_release FIPS202_NAMESPACE(shake256_release)
+/*************************************************
+ * Name:        mld_shake256_release
+ *
+ * Description: Release and securely zero the SHAKE256 state.
+ *
+ * Arguments:   - mld_shake256ctx *state: pointer to state
+ **************************************************/
+void mld_shake256_release(mld_shake256ctx *state)
 __contract__(
-  requires(inlen <= MLD_MAX_BUFFER_SIZE)
-  requires(memory_no_alias(state, sizeof(keccak_state)))
-  requires(memory_no_alias(in, inlen))
-  assigns(memory_slice(state, sizeof(keccak_state)))
-  ensures(state->pos == SHAKE256_RATE)
+  requires(memory_no_alias(state, sizeof(mld_shake256ctx)))
+  assigns(memory_slice(state, sizeof(mld_shake256ctx)))
 );
 
-#define shake256_squeezeblocks FIPS202_NAMESPACE(shake256_squeezeblocks)
-void shake256_squeezeblocks(uint8_t *out, size_t nblocks, keccak_state *state)
-__contract__(
-  requires(nblocks <= 8 /* somewhat arbitrary bound */)
-  requires(memory_no_alias(state, sizeof(keccak_state)))
-  requires(memory_no_alias(out, nblocks * SHAKE256_RATE))
-  requires(state->pos <= SHAKE256_RATE)
-  assigns(memory_slice(state, sizeof(keccak_state)))
-  assigns(memory_slice(out, nblocks * SHAKE256_RATE))
-  ensures(state->pos <= SHAKE256_RATE)
-);
-
-#define shake256_release FIPS202_NAMESPACE(shake256_release)
-void shake256_release(keccak_state *state);
-
-#define shake128 FIPS202_NAMESPACE(shake128)
-void shake128(uint8_t *out, size_t outlen, const uint8_t *in, size_t inlen)
-__contract__(
-  requires(inlen <= MLD_MAX_BUFFER_SIZE)
-  requires(outlen <= 8 * SHAKE128_RATE /* somewhat arbitrary bound */)
-  requires(memory_no_alias(in, inlen))
-  requires(memory_no_alias(out, outlen))
-  assigns(memory_slice(out, outlen))
-);
-
-#define shake256 FIPS202_NAMESPACE(shake256)
-void shake256(uint8_t *out, size_t outlen, const uint8_t *in, size_t inlen)
+#define mld_shake256 FIPS202_NAMESPACE(shake256)
+/*************************************************
+ * Name:        mld_shake256
+ *
+ * Description: SHAKE256 XOF with non-incremental API
+ *
+ * Arguments:   - uint8_t *out: pointer to output
+ *              - size_t outlen: requested output length in bytes
+ *              - const uint8_t *in: pointer to input
+ *              - size_t inlen: length of input in bytes
+ **************************************************/
+void mld_shake256(uint8_t *out, size_t outlen, const uint8_t *in, size_t inlen)
 __contract__(
   requires(inlen <= MLD_MAX_BUFFER_SIZE)
   requires(outlen <= 8 * SHAKE256_RATE /* somewhat arbitrary bound */)
   requires(memory_no_alias(in, inlen))
   requires(memory_no_alias(out, outlen))
   assigns(memory_slice(out, outlen))
-);
-
-#define sha3_256 FIPS202_NAMESPACE(sha3_256)
-void sha3_256(uint8_t h[SHA3_256_HASHBYTES], const uint8_t *in, size_t inlen)
-__contract__(
-  requires(inlen <= MLD_MAX_BUFFER_SIZE)
-  requires(memory_no_alias(in, inlen))
-  requires(memory_no_alias(h, SHA3_256_HASHBYTES))
-  assigns(memory_slice(h, SHA3_256_HASHBYTES))
-);
-
-#define sha3_512 FIPS202_NAMESPACE(sha3_512)
-void sha3_512(uint8_t h[SHA3_512_HASHBYTES], const uint8_t *in, size_t inlen)
-__contract__(
-  requires(inlen <= MLD_MAX_BUFFER_SIZE)
-  requires(memory_no_alias(in, inlen))
-  requires(memory_no_alias(h, SHA3_512_HASHBYTES))
-  assigns(memory_slice(h, SHA3_512_HASHBYTES))
 );
 
 #endif /* !MLD_FIPS202_FIPS202_H */

@@ -270,4 +270,32 @@ static MLD_INLINE void mld_poly_use_hint_88_native(int32_t *b, const int32_t *a,
 static MLD_INLINE uint32_t mld_poly_chknorm_native(const int32_t *a, int32_t B);
 #endif /* MLD_USE_NATIVE_POLY_CHKNORM */
 
+#if defined(MLD_USE_NATIVE_POLYZ_UNPACK_17)
+/*************************************************
+ * Name:        mld_polyz_unpack_17_native
+ *
+ * Description: Native implementation of polyz_unpack for GAMMA1 = 2^17.
+ *              Unpack polynomial z with coefficients
+ *              in [-(MLDSA_GAMMA1 - 1), MLDSA_GAMMA1].
+ *
+ * Arguments:   - int32_t *r: pointer to output polynomial
+ *              - const uint8_t *a: byte array with bit-packed polynomial
+ **************************************************/
+static MLD_INLINE void mld_polyz_unpack_17_native(int32_t *r, const uint8_t *a);
+#endif /* MLD_USE_NATIVE_POLYZ_UNPACK_17 */
+
+#if defined(MLD_USE_NATIVE_POLYZ_UNPACK_19)
+/*************************************************
+ * Name:        mld_polyz_unpack_19_native
+ *
+ * Description: Native implementation of polyz_unpack for GAMMA1 = 2^19.
+ *              Unpack polynomial z with coefficients
+ *              in [-(MLDSA_GAMMA1 - 1), MLDSA_GAMMA1].
+ *
+ * Arguments:   - int32_t *r: pointer to output polynomial
+ *              - const uint8_t *a: byte array with bit-packed polynomial
+ **************************************************/
+static MLD_INLINE void mld_polyz_unpack_19_native(int32_t *r, const uint8_t *a);
+#endif /* MLD_USE_NATIVE_POLYZ_UNPACK_19 */
+
 #endif /* !MLD_NATIVE_API_H */

@@ -19,6 +19,8 @@
 #define MLD_USE_NATIVE_POLY_USE_HINT_32
 #define MLD_USE_NATIVE_POLY_USE_HINT_88
 #define MLD_USE_NATIVE_POLY_CHKNORM
+#define MLD_USE_NATIVE_POLYZ_UNPACK_17
+#define MLD_USE_NATIVE_POLYZ_UNPACK_19
 
 /* Identifier for this backend so that source and assembly files
  * in the build can be appropriately guarded. */
@@ -131,6 +133,18 @@ static MLD_INLINE void mld_poly_use_hint_88_native(int32_t *b, const int32_t *a,
 static MLD_INLINE uint32_t mld_poly_chknorm_native(const int32_t *a, int32_t B)
 {
   return mld_poly_chknorm_asm(a, B);
+}
+
+static MLD_INLINE void mld_polyz_unpack_17_native(int32_t *r,
+                                                  const uint8_t *buf)
+{
+  mld_polyz_unpack_17_asm(r, buf, mld_polyz_unpack_17_indices);
+}
+
+static MLD_INLINE void mld_polyz_unpack_19_native(int32_t *r,
+                                                  const uint8_t *buf)
+{
+  mld_polyz_unpack_19_asm(r, buf, mld_polyz_unpack_19_indices);
 }
 
 #endif /* !__ASSEMBLER__ */

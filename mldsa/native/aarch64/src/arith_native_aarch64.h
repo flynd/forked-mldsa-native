@@ -29,6 +29,11 @@ extern const uint8_t mld_rej_uniform_table[];
 #define mld_rej_uniform_eta_table MLD_NAMESPACE(rej_uniform_eta_table)
 extern const uint8_t mld_rej_uniform_eta_table[];
 
+#define mld_polyz_unpack_17_indices MLD_NAMESPACE(polyz_unpack_17_indices)
+extern const uint8_t mld_polyz_unpack_17_indices[];
+#define mld_polyz_unpack_19_indices MLD_NAMESPACE(polyz_unpack_19_indices)
+extern const uint8_t mld_polyz_unpack_19_indices[];
+
 
 /*
  * Sampling 256 coefficients mod 15 using rejection sampling from 4 bits.
@@ -79,5 +84,13 @@ void mld_poly_use_hint_88_asm(int32_t *b, const int32_t *a, const int32_t *h);
 
 #define mld_poly_chknorm_asm MLD_NAMESPACE(poly_chknorm_asm)
 uint32_t mld_poly_chknorm_asm(const int32_t *a, int32_t B);
+
+#define mld_polyz_unpack_17_asm MLD_NAMESPACE(polyz_unpack_17_asm)
+void mld_polyz_unpack_17_asm(int32_t *r, const uint8_t *buf,
+                             const uint8_t *indices);
+
+#define mld_polyz_unpack_19_asm MLD_NAMESPACE(polyz_unpack_19_asm)
+void mld_polyz_unpack_19_asm(int32_t *r, const uint8_t *buf,
+                             const uint8_t *indices);
 
 #endif /* !MLD_NATIVE_AARCH64_SRC_ARITH_NATIVE_AARCH64_H */

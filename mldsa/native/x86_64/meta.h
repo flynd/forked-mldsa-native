@@ -23,6 +23,8 @@
 #define MLD_USE_NATIVE_POLY_USE_HINT_32
 #define MLD_USE_NATIVE_POLY_USE_HINT_88
 #define MLD_USE_NATIVE_POLY_CHKNORM
+#define MLD_USE_NATIVE_POLYZ_UNPACK_17
+#define MLD_USE_NATIVE_POLYZ_UNPACK_19
 
 #if !defined(__ASSEMBLER__)
 #include <string.h>
@@ -137,6 +139,16 @@ static MLD_INLINE void mld_poly_use_hint_88_native(int32_t *b, const int32_t *a,
 static MLD_INLINE uint32_t mld_poly_chknorm_native(const int32_t *a, int32_t B)
 {
   return mld_poly_chknorm_avx2((const __m256i *)a, B);
+}
+
+static MLD_INLINE void mld_polyz_unpack_17_native(int32_t *r, const uint8_t *a)
+{
+  mld_polyz_unpack_17_avx2((__m256i *)r, a);
+}
+
+static MLD_INLINE void mld_polyz_unpack_19_native(int32_t *r, const uint8_t *a)
+{
+  mld_polyz_unpack_19_avx2((__m256i *)r, a);
 }
 
 #endif /* !__ASSEMBLER__ */

@@ -1289,11 +1289,10 @@ def update_via_simpasm(
             # Determine architecture from filename
             arch = "aarch64" if "aarch64" in infile_full else "x86_64"
 
-            # TODO: Temporary remvoe the "--cfify", add back when CFI script added.
             cmd = [
                 "./scripts/simpasm",
                 "--objdump=llvm-objdump",
-                # "--cfify",
+                "--cfify",
                 "--arch=" + arch,
                 "-i",
                 infile_full,

@@ -49,19 +49,23 @@ endif
 #
 # mldsa-native source and header files
 #
-# If you are not concerned about minimizing for a specific backend,
-# you can just include _all_ source files into your build.
-#
 # In this example, we compile the individual mldsa-native source files directly.
 # Alternatively, you can compile the 'monobuild' source file mldsa_native.c.
 # See examples/monolithic_build for that.
-MLD_SOURCE=$(wildcard					\
-	mldsa_native/mldsa/*.c				\
-	mldsa_native/mldsa/**/*.c			\
-	mldsa_native/mldsa/**/**/*.c		\
-	mldsa_native/mldsa/**/**/**/*.c)
+MLD_SOURCE=$(wildcard \
+	mldsa_native/*.c \
+	mldsa_native/**/*.c \
+	mldsa_native/**/**/*.c \
+	mldsa_native/**/**/**/*.c)
+
+INC=-Imldsa_native/
 
 # Part B:
+#
+# Custom FIPS-202 implementation
+FIPS202_SOURCE=custom_fips202/tiny_sha3/sha3.c
+
+# Part C:
 #
 # Random number generator
 #
@@ -73,15 +77,12 @@ MLD_SOURCE=$(wildcard					\
 # !!! WARNING !!!
 RNG_SOURCE=$(wildcard test_only_rng/*.c)
 
-# Part C:
+# Part D:
 #
 # Your application source code
 APP_SOURCE=$(wildcard *.c)
 
-ALL_SOURCE=$(MLD_SOURCE) $(RNG_SOURCE) $(APP_SOURCE)
-
-BUILD_DIR=build
-BIN=test_binary
+ALL_SOURCE=$(MLD_SOURCE) $(FIPS202_SOURCE) $(RNG_SOURCE) $(APP_SOURCE)
 
 #
 # Configuration adjustments
@@ -89,6 +90,14 @@ BIN=test_binary
 
 # Pick prefix
 CFLAGS += -DMLD_CONFIG_NAMESPACE_PREFIX=mldsa
+# Tell mldsa-native where to find the header for the custom FIPS202
+# The structure names and function signatures exposed in those headers must
+# match those from the standard FIPS202 implementation. See FIPS202.md.
+CFLAGS += -DMLD_CONFIG_FIPS202_CUSTOM_HEADER="\"../custom_fips202/fips202.h\""
+CFLAGS += -DMLD_CONFIG_FIPS202X4_CUSTOM_HEADER="\"../custom_fips202/fips202x4.h\""
+
+BUILD_DIR=build
+BIN=test_binary
 
 BINARY_NAME_FULL_44=$(BUILD_DIR)/$(BIN)44
 BINARY_NAME_FULL_65=$(BUILD_DIR)/$(BIN)65
@@ -102,7 +111,7 @@ $(BINARY_NAME_FULL_87): CFLAGS += -DMLD_CONFIG_PARAMETER_SET=87
 $(BINARIES_FULL): $(ALL_SOURCE)
 	echo "$@"
 	mkdir -p $(BUILD_DIR)
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $(INC) $^ -o $@
 
 all: build
 

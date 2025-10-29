@@ -28,14 +28,12 @@
     }                                                         \
   } while (0)
 
-static int test_sign(void)
+
+static int test_sign_core(uint8_t pk[CRYPTO_PUBLICKEYBYTES],
+                          uint8_t sk[CRYPTO_SECRETKEYBYTES],
+                          uint8_t sm[MLEN + CRYPTO_BYTES], uint8_t m[MLEN],
+                          uint8_t m2[MLEN + CRYPTO_BYTES], uint8_t ctx[CTXLEN])
 {
-  uint8_t pk[CRYPTO_PUBLICKEYBYTES];
-  uint8_t sk[CRYPTO_SECRETKEYBYTES];
-  uint8_t sm[MLEN + CRYPTO_BYTES];
-  uint8_t m[MLEN];
-  uint8_t m2[MLEN + CRYPTO_BYTES];
-  uint8_t ctx[CTXLEN];
   size_t smlen;
   size_t mlen;
   int rc;
@@ -43,9 +41,9 @@ static int test_sign(void)
 
   CHECK(crypto_sign_keypair(pk, sk) == 0);
   randombytes(ctx, CTXLEN);
-  MLD_CT_TESTING_SECRET(ctx, sizeof(ctx));
+  MLD_CT_TESTING_SECRET(ctx, CTXLEN);
   randombytes(m, MLEN);
-  MLD_CT_TESTING_SECRET(m, sizeof(m));
+  MLD_CT_TESTING_SECRET(m, MLEN);
 
   CHECK(crypto_sign(sm, &smlen, m, MLEN, ctx, CTXLEN, sk) == 0);
 
@@ -53,8 +51,8 @@ static int test_sign(void)
 
   /* Constant time: Declassify outputs to check them. */
   MLD_CT_TESTING_DECLASSIFY(rc, sizeof(int));
-  MLD_CT_TESTING_DECLASSIFY(m, sizeof(m));
-  MLD_CT_TESTING_DECLASSIFY(m2, sizeof(m2));
+  MLD_CT_TESTING_DECLASSIFY(m, MLEN);
+  MLD_CT_TESTING_DECLASSIFY(m2, (MLEN + CRYPTO_BYTES));
 
   if (rc)
   {
@@ -81,6 +79,30 @@ static int test_sign(void)
   }
 
   return 0;
+}
+
+static int test_sign(void)
+{
+  uint8_t pk[CRYPTO_PUBLICKEYBYTES];
+  uint8_t sk[CRYPTO_SECRETKEYBYTES];
+  uint8_t sm[MLEN + CRYPTO_BYTES];
+  uint8_t m[MLEN];
+  uint8_t m2[MLEN + CRYPTO_BYTES];
+  uint8_t ctx[CTXLEN];
+
+  return test_sign_core(pk, sk, sm, m, m2, ctx);
+}
+
+static int test_sign_unaligned(void)
+{
+  MLD_ALIGN uint8_t pk[CRYPTO_PUBLICKEYBYTES + 1];
+  MLD_ALIGN uint8_t sk[CRYPTO_SECRETKEYBYTES + 1];
+  MLD_ALIGN uint8_t sm[MLEN + CRYPTO_BYTES + 1];
+  MLD_ALIGN uint8_t m[MLEN + 1];
+  MLD_ALIGN uint8_t m2[MLEN + CRYPTO_BYTES + 1];
+  MLD_ALIGN uint8_t ctx[CTXLEN + 1];
+
+  return test_sign_core(pk + 1, sk + 1, sm + 1, m + 1, m2 + 1, ctx + 1);
 }
 
 static int test_wrong_pk(void)
@@ -249,6 +271,7 @@ int main(void)
   for (i = 0; i < NTESTS; i++)
   {
     r = test_sign();
+    r |= test_sign_unaligned();
     r |= test_wrong_pk();
     r |= test_wrong_sig();
     r |= test_wrong_ctx();

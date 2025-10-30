@@ -105,6 +105,52 @@ static int test_sign_unaligned(void)
   return test_sign_core(pk + 1, sk + 1, sm + 1, m + 1, m2 + 1, ctx + 1);
 }
 
+static int test_sign_extmu(void)
+{
+  uint8_t pk[CRYPTO_PUBLICKEYBYTES];
+  uint8_t sk[CRYPTO_SECRETKEYBYTES];
+  uint8_t sig[CRYPTO_BYTES];
+  uint8_t mu[MLDSA_CRHBYTES];
+  size_t siglen;
+
+  CHECK(crypto_sign_keypair(pk, sk) == 0);
+  randombytes(mu, MLDSA_CRHBYTES);
+  MLD_CT_TESTING_SECRET(mu, sizeof(mu));
+
+  CHECK(crypto_sign_signature_extmu(sig, &siglen, mu, sk) == 0);
+  CHECK(crypto_sign_verify_extmu(sig, siglen, mu, pk) == 0);
+
+  return 0;
+}
+
+
+static int test_sign_pre_hash(void)
+{
+  uint8_t pk[CRYPTO_PUBLICKEYBYTES];
+  uint8_t sk[CRYPTO_SECRETKEYBYTES];
+  uint8_t sig[CRYPTO_BYTES];
+  uint8_t m[MLEN];
+  uint8_t ctx[CTXLEN];
+  uint8_t rnd[MLDSA_RNDBYTES];
+  size_t siglen;
+
+
+  CHECK(crypto_sign_keypair(pk, sk) == 0);
+  randombytes(ctx, CTXLEN);
+  MLD_CT_TESTING_SECRET(ctx, sizeof(ctx));
+  randombytes(m, MLEN);
+  MLD_CT_TESTING_SECRET(m, sizeof(m));
+  randombytes(rnd, MLDSA_RNDBYTES);
+  MLD_CT_TESTING_SECRET(rnd, sizeof(rnd));
+
+  CHECK(crypto_sign_signature_pre_hash_shake256(sig, &siglen, m, MLEN, ctx,
+                                                CTXLEN, rnd, sk) == 0);
+  CHECK(crypto_sign_verify_pre_hash_shake256(sig, siglen, m, MLEN, ctx, CTXLEN,
+                                             pk) == 0);
+
+  return 0;
+}
+
 static int test_wrong_pk(void)
 {
   uint8_t pk[CRYPTO_PUBLICKEYBYTES];
@@ -275,6 +321,8 @@ int main(void)
     r |= test_wrong_pk();
     r |= test_wrong_sig();
     r |= test_wrong_ctx();
+    r |= test_sign_extmu();
+    r |= test_sign_pre_hash();
     if (r)
     {
       return 1;

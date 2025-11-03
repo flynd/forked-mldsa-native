@@ -340,8 +340,8 @@ ADD_LIBRARY_FLAG := --add-library
 INCLUDES ?=
 INCLUDES += -I$(PROOFDIR)
 INCLUDES += -I$(SRCDIR)/proofs/cbmc
-INCLUDES += -I$(SRCDIR)/mldsa
-INCLUDES += -I$(SRCDIR)/mldsa/fips202
+INCLUDES += -I$(SRCDIR)/mldsa/src
+INCLUDES += -I$(SRCDIR)/mldsa/src/fips202
 
 # Preprocessor definitions -D...
 DEFINES ?=

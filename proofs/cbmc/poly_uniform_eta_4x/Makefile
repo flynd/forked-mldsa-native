@@ -17,7 +17,7 @@ REMOVE_FUNCTION_BODY +=
 UNWINDSET +=
 
 PROOF_SOURCES += $(PROOFDIR)/$(HARNESS_FILE).c
-PROJECT_SOURCES += $(SRCDIR)/mldsa/poly_kl.c $(SRCDIR)/mldsa/fips202/fips202x4.c
+PROJECT_SOURCES += $(SRCDIR)/mldsa/src/poly_kl.c $(SRCDIR)/mldsa/src/fips202/fips202x4.c
 
 CHECK_FUNCTION_CONTRACTS=$(MLD_NAMESPACE)poly_uniform_eta_4x
 USE_FUNCTION_CONTRACTS=$(FIPS202_NAMESPACE)shake256x4_absorb_once $(FIPS202_NAMESPACE)shake256x4_squeezeblocks mld_rej_eta
@@ -45,7 +45,7 @@ CBMC_OBJECT_BITS = 9
 # ("mldsa/poly.c") in PROJECT_SOURCES).
 # REWRITTEN_SOURCES = $(PROOFDIR)/<__SOURCE_FILE_BASENAME__>.i
 # include ../Makefile.common
-# $(PROOFDIR)/<__SOURCE_FILE_BASENAME__>.i_SOURCE = $(SRCDIR)/mldsa/poly.c
+# $(PROOFDIR)/<__SOURCE_FILE_BASENAME__>.i_SOURCE = $(SRCDIR)/mldsa/src/poly.c
 # $(PROOFDIR)/<__SOURCE_FILE_BASENAME__>.i_FUNCTIONS = foo bar
 # $(PROOFDIR)/<__SOURCE_FILE_BASENAME__>.i_OBJECTS = baz
 # Care is required with variables on the left-hand side: REWRITTEN_SOURCES must

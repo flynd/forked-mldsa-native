@@ -16,7 +16,7 @@ INCLUDES +=
 REMOVE_FUNCTION_BODY +=
 
 PROOF_SOURCES += $(PROOFDIR)/$(HARNESS_FILE).c
-PROJECT_SOURCES += $(SRCDIR)/mldsa/packing.c
+PROJECT_SOURCES += $(SRCDIR)/mldsa/src/packing.c
 
 CHECK_FUNCTION_CONTRACTS=$(MLD_NAMESPACE)pack_sig
 USE_FUNCTION_CONTRACTS=$(MLD_NAMESPACE)polyvecl_pack_z
@@ -44,7 +44,7 @@ CBMC_OBJECT_BITS = 9
 # ("mldsa/poly.c") in PROJECT_SOURCES).
 # REWRITTEN_SOURCES = $(PROOFDIR)/<__SOURCE_FILE_BASENAME__>.i
 # include ../Makefile.common
-# $(PROOFDIR)/<__SOURCE_FILE_BASENAME__>.i_SOURCE = $(SRCDIR)/mldsa/poly.c
+# $(PROOFDIR)/<__SOURCE_FILE_BASENAME__>.i_SOURCE = $(SRCDIR)/mldsa/src/poly.c
 # $(PROOFDIR)/<__SOURCE_FILE_BASENAME__>.i_FUNCTIONS = foo bar
 # $(PROOFDIR)/<__SOURCE_FILE_BASENAME__>.i_OBJECTS = baz
 # Care is required with variables on the left-hand side: REWRITTEN_SOURCES must

@@ -4,8 +4,8 @@
 
 If your library has a FIPS-202[^FIPS202] implementation, you can use it instead of the one shipped with mldsa-native.
 
-1. Replace `mldsa/fips202/*` by your own FIPS-202 implementation.
-2. Provide replacements for the headers [`mldsa/fips202/fips202.h`](mldsa/fips202/fips202.h) and [`mldsa/fips202/fips202x4.h`](mldsa/fips202/fips202x4.h) and the
+1. Replace `mldsa/src/fips202/*` by your own FIPS-202 implementation.
+2. Provide replacements for the headers [`mldsa/src/fips202/fips202.h`](mldsa/src/fips202/fips202.h) and [`mldsa/src/fips202/fips202x4.h`](mldsa/src/fips202/fips202x4.h) and the
 functionalities specified therein:
   * Structure definitions for `mld_shake128ctx`, `mld_shake256ctx`, `mld_shake128x4ctx`, and `mld_shake256x4ctx`
   * `mld_shake128_init()`: Initialize a SHAKE-128 context
@@ -28,7 +28,7 @@ functionalities specified therein:
   * `mld_shake256x4_squeezeblocks()`: Squeeze blocks from a 4x-batched SHAKE-256 context
   * `mld_shake256x4_release()`: Release a 4x-batched SHAKE-256 context after use
 
-See [`mldsa/fips202/fips202.h`](mldsa/fips202/fips202.h) and [`mldsa/fips202/fips202x4.h`](mldsa/fips202/fips202x4.h) for more details. Note that the structure
+See [`mldsa/src/fips202/fips202.h`](mldsa/src/fips202/fips202.h) and [`mldsa/src/fips202/fips202x4.h`](mldsa/src/fips202/fips202x4.h) for more details. Note that the structure
 definitions may differ from those shipped with mldsa-native.
 
 ## Example

@@ -93,7 +93,7 @@ gh_summary_failure()
 
 gh_error()
 {
-  if $IN_GITHUB_CONTEXT; then
+  if $IN_GITHUB_COgNTEXT; then
     echo "::error file=$1,line=${2:-1},title=$3::$4"
   fi
 }

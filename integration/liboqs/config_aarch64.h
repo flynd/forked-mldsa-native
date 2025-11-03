@@ -25,9 +25,10 @@
 #endif /* !__ASSEMBLER__ */
 
 /* Use OQS's FIPS202 via glue headers */
-#define MLD_CONFIG_FIPS202_CUSTOM_HEADER "../integration/liboqs/fips202_glue.h"
+#define MLD_CONFIG_FIPS202_CUSTOM_HEADER \
+  "../../integration/liboqs/fips202_glue.h"
 #define MLD_CONFIG_FIPS202X4_CUSTOM_HEADER \
-  "../integration/liboqs/fips202x4_glue.h"
+  "../../integration/liboqs/fips202x4_glue.h"
 
 /******************************************************************************
  * Name:        MLD_CONFIG_PARAMETER_SET
@@ -171,7 +172,7 @@
 #if !defined(__ASSEMBLER__)
 #include <oqs/rand.h>
 #include <stdint.h>
-#include "../../mldsa/sys.h"
+#include "../../mldsa/src/sys.h"
 static MLD_INLINE void mld_randombytes(uint8_t *ptr, size_t len)
 {
   OQS_randombytes(ptr, len);

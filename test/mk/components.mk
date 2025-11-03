@@ -2,15 +2,15 @@
 # Copyright (c) The mldsa-native project authors
 # SPDX-License-Identifier: Apache-2.0 OR ISC OR MIT
 
-FIPS202_SRCS = $(wildcard mldsa/fips202/*.c)
+FIPS202_SRCS = $(wildcard mldsa/src/fips202/*.c)
 ifeq ($(OPT),1)
-	FIPS202_SRCS += $(wildcard mldsa/fips202/native/aarch64/src/*.S) $(wildcard mldsa/fips202/native/aarch64/src/*.c) $(wildcard mldsa/fips202/native/x86_64/src/*.c)
+	FIPS202_SRCS += $(wildcard mldsa/src/fips202/native/aarch64/src/*.S) $(wildcard mldsa/src/fips202/native/aarch64/src/*.c) $(wildcard mldsa/src/fips202/native/x86_64/src/*.c)
 endif
 
 
-SOURCES += $(wildcard mldsa/*.c)
+SOURCES += $(wildcard mldsa/src/*.c)
 ifeq ($(OPT),1)
-	SOURCES += $(wildcard mldsa/native/aarch64/src/*.[csS]) $(wildcard mldsa/native/x86_64/src/*.[csS])
+	SOURCES += $(wildcard mldsa/src/native/aarch64/src/*.[csS]) $(wildcard mldsa/src/native/x86_64/src/*.[csS])
 	CFLAGS += -DMLD_CONFIG_USE_NATIVE_BACKEND_ARITH -DMLD_CONFIG_USE_NATIVE_BACKEND_FIPS202
 endif
 

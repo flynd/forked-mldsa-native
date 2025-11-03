@@ -2,7 +2,7 @@
 # Copyright (c) The mldsa-native project authors
 # SPDX-License-Identifier: Apache-2.0 OR ISC OR MIT
 
-CFLAGS = /nologo /O2 /Imldsa /Imlmdsa/fips202 /Imldsa/fips202/native /Imldsa/native
+CFLAGS = /nologo /O2 /Imldsa /Imldsa/src/ /Imlmdsa/src/fips202 /Imldsa/src/fips202/native /Imldsa/src/native
 
 OBJ_FILES = .\mldsa\*.obj \
             .\mldsa\fips202\*.obj
@@ -29,11 +29,11 @@ OPT = 0
     $(CC) $(CFLAGS) /c /Fo$(BUILD_DIR)\randombytes\ $<
 
 # compilation for mldsa44
-{mldsa}.c{$(MLDSA44_BUILD_DIR)\mldsa}.obj::
+{mldsa\src}.c{$(MLDSA44_BUILD_DIR)\mldsa}.obj::
     @if NOT EXIST $(MLDSA44_BUILD_DIR)\mldsa mkdir $(MLDSA44_BUILD_DIR)\mldsa
     $(CC) $(CFLAGS) /D MLD_CONFIG_PARAMETER_SET=44 /c /Fo$(MLDSA44_BUILD_DIR)\mldsa\ $<
 
-{mldsa\fips202}.c{$(MLDSA44_BUILD_DIR)\mldsa\fips202}.obj::
+{mldsa\src\fips202}.c{$(MLDSA44_BUILD_DIR)\mldsa\fips202}.obj::
     @if NOT EXIST $(MLDSA44_BUILD_DIR)\mldsa\fips202 mkdir $(MLDSA44_BUILD_DIR)\mldsa\fips202
     $(CC) $(CFLAGS) /D MLD_CONFIG_PARAMETER_SET=44 /c /Fo$(MLDSA44_BUILD_DIR)\mldsa\fips202\ $<
 
@@ -42,11 +42,11 @@ OPT = 0
     $(CC) $(CFLAGS) /D MLD_CONFIG_PARAMETER_SET=44 /c /Fo$(MLDSA44_BUILD_DIR)\test\ $<
 
 # compilation for mldsa65
-{mldsa}.c{$(MLDSA65_BUILD_DIR)\mldsa}.obj::
+{mldsa\src}.c{$(MLDSA65_BUILD_DIR)\mldsa}.obj::
     @if NOT EXIST $(MLDSA65_BUILD_DIR)\mldsa mkdir $(MLDSA65_BUILD_DIR)\mldsa
     $(CC) $(CFLAGS) /D MLD_CONFIG_PARAMETER_SET=65 /c /Fo$(MLDSA65_BUILD_DIR)\mldsa\ $<
 
-{mldsa\fips202}.c{$(MLDSA65_BUILD_DIR)\mldsa\fips202}.obj::
+{mldsa\src\fips202}.c{$(MLDSA65_BUILD_DIR)\mldsa\fips202}.obj::
     @if NOT EXIST $(MLDSA65_BUILD_DIR)\mldsa\fips202 mkdir $(MLDSA65_BUILD_DIR)\mldsa\fips202
     $(CC) $(CFLAGS) /D MLD_CONFIG_PARAMETER_SET=65 /c /Fo$(MLDSA65_BUILD_DIR)\mldsa\fips202\ $<
 
@@ -55,11 +55,11 @@ OPT = 0
     $(CC) $(CFLAGS) /D MLD_CONFIG_PARAMETER_SET=65 /c /Fo$(MLDSA65_BUILD_DIR)\test\ $<
 
 # compilation for mldsa87
-{mldsa}.c{$(MLDSA87_BUILD_DIR)\mldsa}.obj::
+{mldsa\src}.c{$(MLDSA87_BUILD_DIR)\mldsa}.obj::
     @if NOT EXIST $(MLDSA87_BUILD_DIR)\mldsa mkdir $(MLDSA87_BUILD_DIR)\mldsa
     $(CC) $(CFLAGS) /D MLD_CONFIG_PARAMETER_SET=87 /c /Fo$(MLDSA87_BUILD_DIR)\mldsa\ $<
 
-{mldsa\fips202}.c{$(MLDSA87_BUILD_DIR)\mldsa\fips202}.obj::
+{mldsa\src\fips202}.c{$(MLDSA87_BUILD_DIR)\mldsa\fips202}.obj::
     @if NOT EXIST $(MLDSA87_BUILD_DIR)\mldsa\fips202 mkdir $(MLDSA87_BUILD_DIR)\mldsa\fips202
     $(CC) $(CFLAGS) /D MLD_CONFIG_PARAMETER_SET=87 /c /Fo$(MLDSA87_BUILD_DIR)\mldsa\fips202\ $<
 

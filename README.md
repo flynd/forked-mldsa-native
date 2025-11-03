@@ -41,7 +41,7 @@ make test
 
 ## Formal Verification
 
-We use the [C Bounded Model Checker (CBMC)](https://github.com/diffblue/cbmc) to prove absence of various classes of undefined behaviour in C, including out of bounds memory accesses and integer overflows. The proofs cover all C code in [mldsa/*](mldsa) and [mldsa/fips202/*](mldsa/fips202) involved in running mldsa-native with its C backend. See [proofs/cbmc](proofs/cbmc) for details.
+We use the [C Bounded Model Checker (CBMC)](https://github.com/diffblue/cbmc) to prove absence of various classes of undefined behaviour in C, including out of bounds memory accesses and integer overflows. The proofs cover all C code in [mldsa/src/*](mldsa) and [mldsa/src/fips202/*](mldsa/src/fips202) involved in running mldsa-native with its C backend. See [proofs/cbmc](proofs/cbmc) for details.
 
 ## Security
 
@@ -54,8 +54,8 @@ timing side channels through suitable barriers and constant-time patterns.
 mldsa-native is split into a _frontend_ and two _backends_ for arithmetic and FIPS202 / SHA3. The frontend is
 fixed, written in C, and covers all routines that are not critical to performance. The backends are flexible, take care of
 performance-sensitive routines, and can be implemented in C or native code (assembly/intrinsics); see
-[mldsa/native/api.h](mldsa/native/api.h) for the arithmetic backend and
-[mldsa/fips202/native/api.h](mldsa/fips202/native/api.h) for the FIPS-202 backend. mldsa-native currently
+[mldsa/src/native/api.h](mldsa/src/native/api.h) for the arithmetic backend and
+[mldsa/src/fips202/native/api.h](mldsa/src/fips202/native/api.h) for the FIPS-202 backend. mldsa-native currently
 offers backends for C, AArch64, and x86_64 - if you'd like contribute new backends, please reach out or just open a PR.
 
 ## Usage

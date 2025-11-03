@@ -8,8 +8,8 @@ This directory contains a minimal example for how to build mldsa-native.
 
 An application using mldsa-native as-is needs to include the following components:
 
-1. mldsa-native source tree, including [`mldsa/`](../../mldsa) and [`mldsa/fips202/`](../../mldsa/fips202).
-2. A secure pseudo random number generator, implementing [`randombytes.h`](../../mldsa/randombytes.h).
+1. mldsa-native source tree, including [`mldsa/src/`](../../mldsa/src) and [`mldsa/src/fips202/`](../../mldsa/src/fips202).
+2. A secure pseudo random number generator, implementing [`randombytes.h`](../../mldsa/src/randombytes.h).
 3. The application source code
 
 **WARNING:** The `randombytes()` implementation used here is for TESTING ONLY. You MUST NOT use this implementation

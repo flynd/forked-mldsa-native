@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sign.h"
+#include "src/sign.h"
 
 static void test_keygen_only(void)
 {

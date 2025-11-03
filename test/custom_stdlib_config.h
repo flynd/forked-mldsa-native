@@ -119,7 +119,7 @@
  * Name:        MLD_CONFIG_FILE
  *
  * Description: If defined, this is a header that will be included instead
- *              of the default configuration file mldsa/config.h.
+ *              of the default configuration file mldsa/src/config.h.
  *
  *              When you need to build mldsa-native in multiple configurations,
  *              using varying MLD_CONFIG_FILE can be more convenient
@@ -179,7 +179,7 @@
  *              with mldsa-native.
  *
  *              If set, it must be the name of a file serving as the
- *              replacement for mldsa/fips202/fips202.h, and exposing
+ *              replacement for mldsa/src/fips202/fips202.h, and exposing
  *              the same API (see FIPS202.md).
  *
  *****************************************************************************/
@@ -195,7 +195,7 @@
  *              with mldsa-native.
  *
  *              If set, it must be the name of a file serving as the
- *              replacement for mldsa/fips202/fips202x4.h, and exposing
+ *              replacement for mldsa/src/fips202/fips202x4.h, and exposing
  *              the same API (see FIPS202.md).
  *
  *****************************************************************************/
@@ -258,7 +258,7 @@
 #if !defined(__ASSEMBLER__)
 #include <stddef.h>
 #include <stdint.h>
-#include "../mldsa/sys.h"
+#include "../mldsa/src/sys.h"
 static MLD_INLINE void *mld_memcpy(void *dest, const void *src, size_t n)
 {
   /* Simple byte-by-byte copy implementation for testing */
@@ -289,7 +289,7 @@ static MLD_INLINE void *mld_memcpy(void *dest, const void *src, size_t n)
 #if !defined(__ASSEMBLER__)
 #include <stddef.h>
 #include <stdint.h>
-#include "../mldsa/sys.h"
+#include "../mldsa/src/sys.h"
 static MLD_INLINE void *mld_memset(void *s, int c, size_t n)
 {
   /* Simple byte-by-byte set implementation for testing */

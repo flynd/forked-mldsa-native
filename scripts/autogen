@@ -547,7 +547,9 @@ def gen_c_zeta_file(dry_run=False):
         yield "};"
         yield ""
 
-    update_file("mldsa/zetas.inc", "\n".join(gen()), dry_run=dry_run, force_format=True)
+    update_file(
+        "mldsa/src/zetas.inc", "\n".join(gen()), dry_run=dry_run, force_format=True
+    )
 
 
 def prepare_root_for_barrett(root):
@@ -1007,249 +1009,6 @@ def gen_avx2_zeta_file(dry_run=False):
     update_file("dev/x86_64/src/x86_64_zetas.i", "\n".join(gen()), dry_run=dry_run)
 
 
-def get_oqs_shared_sources(backend):
-    """Get shared source files for OQS integration"""
-    mldsa_dir = "mldsa"
-
-    # add files mldsa/*
-    sources = [
-        f"mldsa/{f}"
-        for f in os.listdir(mldsa_dir)
-        if os.path.isfile(f"{mldsa_dir}/{f}")
-        and not f.endswith(".o")
-        and not f == "mldsa_native.h"
-    ]
-
-    if backend != "ref":
-        # add files mldsa/native/* (API definitions)
-        sources += [
-            f"mldsa/native/{f}"
-            for f in os.listdir(f"{mldsa_dir}/native")
-            if os.path.isfile(f"{mldsa_dir}/native/{f}")
-        ]
-    # We use a custom config
-    sources.remove("mldsa/config.h")
-    # Add FIPS202 glue code
-    sources += [
-        "integration/liboqs/fips202_glue.h",
-        "integration/liboqs/fips202x4_glue.h",
-    ]
-    # Add custom config
-    if backend == "ref":
-        backend = "c"
-    sources.append(f"integration/liboqs/config_{backend.lower()}.h")
-
-    return sources
-
-
-def get_oqs_native_sources(backend):
-    """Get native source files for OQS integration"""
-    return [f"mldsa/native/{backend}"]
-
-
-def gen_oqs_meta_file(filename, dry_run=False):
-    """Generate OQS META.yml file with updated source lists"""
-    status_update("OQS META", filename)
-
-    with open(filename, "r") as f:
-        content = f.read()
-
-    # Parse YAML while preserving structure
-    yml_data = yaml.safe_load(content)
-
-    for impl in yml_data["implementations"]:
-        name = impl["name"]
-
-        sources = get_oqs_shared_sources(name)
-
-        # NOTE: Sorting at the end causes the libOQS importer to fail.
-        # Somehow, the native directory cannot be imported too early.
-        sources.sort()
-
-        if name != "ref":
-            sources += get_oqs_native_sources(name)
-        impl["sources"] = " ".join(sources)
-
-    # Convert back to YAML string with standard copyright header
-    yaml_header = "\n".join(gen_yaml_header())
-
-    new_content = yaml.dump(
-        yml_data,
-        default_flow_style=False,
-        sort_keys=False,
-        allow_unicode=True,
-        encoding=None,
-    )
-
-    # Combine copyright header with new YAML content
-    new_content = yaml_header + new_content
-
-    update_file(filename, new_content, dry_run=dry_run)
-
-
-def gen_oqs_meta_files(dry_run=False):
-    """Generate all OQS META.yml files"""
-    meta_files = [
-        "integration/liboqs/ML-DSA-44_META.yml",
-        "integration/liboqs/ML-DSA-65_META.yml",
-        "integration/liboqs/ML-DSA-87_META.yml",
-    ]
-
-    for meta_file in meta_files:
-        gen_oqs_meta_file(meta_file, dry_run=dry_run)
-
-
-def adjust_header_guard_for_filename(content, header_file):
-
-    status_update("header guards", header_file)
-
-    content = content.split("\n")
-    exceptions = {"mldsa/mldsa_native.h": "MLD_H"}
-
-    # Use full filename as the header guard, with '/' and '.' replaced by '_'
-    guard_name = (
-        header_file.removeprefix("mldsa/").replace("/", "_").replace(".", "_").upper()
-    )
-    guard_name = "MLD_" + guard_name
-
-    if header_file in exceptions.keys():
-        guard_name = exceptions[header_file]
-
-    def gen_guard():
-        yield f"#ifndef {guard_name}"
-        yield f"#define {guard_name}"
-
-    def gen_footer():
-        yield f"#endif"
-        yield ""
-
-    guard = list(gen_guard())
-    footer = list(gen_footer())
-
-    # Skip over initial commentary
-    insert_at = None
-    for i, l in enumerate(content):
-        if l.strip() == "" or l.startswith(("/*", " *")):
-            continue
-        insert_at = i
-        break
-
-    i = insert_at
-    while content[i].strip() == "":
-        i += 1
-    # Check if header file has some guard -- if so, drop it
-    if content[i].strip().startswith("#if !defined") or content[i].strip().startswith(
-        "#ifndef"
-    ):
-        del content[i]
-        if content[i].strip().startswith("#define"):
-            del content[i]
-        has_guard = True
-    else:
-        has_guard = False
-    # Add standardized guard
-    content = content[:i] + guard + content[i:]
-    # Check if header has some footer
-    if (
-        has_guard is True
-        and content[-1] == ""
-        and content[-2].strip().startswith("#endif")
-    ):
-        del content[-2:]
-    # Add standardized footer
-    content = content + footer
-
-    return "\n".join(content)
-
-
-def gen_header_guard(header_file, dry_run=False):
-    with open(header_file, "r") as f:
-        content = f.read()
-    new_content = adjust_header_guard_for_filename(content, header_file)
-    update_file(header_file, new_content, dry_run=dry_run)
-
-
-def gen_header_guards(dry_run=False):
-    with ThreadPoolExecutor() as executor:
-        _ = list(
-            executor.map(
-                partial(gen_header_guard, dry_run=dry_run),
-                get_header_files(main_only=True),
-            )
-        )
-
-
-def get_markdown_files():
-    return get_files("**/*.md")
-
-
-def gen_yaml_header():
-    yield "# Copyright (c) The mldsa-native project authors"
-    yield "# SPDX-License-Identifier: Apache-2.0 OR ISC OR MIT"
-    yield ""
-
-
-class BibliographyEntry:
-    def __init__(self, raw_dict):
-        self._raw = raw_dict
-        self._usages = []
-
-    def register_usages(self, lst):
-        self._usages += lst
-
-    @property
-    def usages(self):
-        return self._usages
-
-    @property
-    def name(self):
-        return self._raw["name"]
-
-    @property
-    def short(self):
-        if "short" in self._raw.keys():
-            return self._raw["short"]
-        return self.name
-
-    @property
-    def id(self):
-        return self._raw["id"]
-
-    @property
-    def url(self):
-        return self._raw["url"]
-
-    @staticmethod
-    def full_name(name):
-        if "," not in name:
-            return name
-        surname, forename = name.split(",")
-        return forename.strip() + " " + surname.strip()
-
-    @property
-    def authors(self):
-        authors = self._raw["author"]
-        if not isinstance(authors, list):
-            authors = [authors]
-        authors = list(map(BibliographyEntry.full_name, authors))
-        return authors
-
-    @property
-    def authors_text(self):
-        authors = self._raw["author"]
-        if not isinstance(authors, list):
-            authors = [authors]
-
-        def surname(name):
-            return name.split(",")[0].strip()
-
-        if len(authors) > 1:
-            authors = ", ".join(map(surname, authors))
-        else:
-            authors = BibliographyEntry.full_name(authors[0])
-        return authors
-
-
 def update_via_simpasm(
     infile_full,
     outdir,
@@ -1434,52 +1193,52 @@ def synchronize_backends(
         # We may switch the AArch64 arithmetic backend, so adjust the metadata file
         update_via_copy(
             f"dev/aarch64_{ty}/meta.h",
-            "mldsa/native/aarch64/meta.h",
+            "mldsa/src/native/aarch64/meta.h",
             dry_run=dry_run,
             transform=lambda c: adjust_header_guard_for_filename(
-                c, "mldsa/native/aarch64/meta.h"
+                c, "mldsa/src/native/aarch64/meta.h"
             ),
         )
 
         update_via_copy(
             f"dev/x86_64/meta.h",
-            "mldsa/native/x86_64/meta.h",
+            "mldsa/src/native/x86_64/meta.h",
             dry_run=dry_run,
             transform=lambda c: adjust_header_guard_for_filename(
-                c, "mldsa/native/x86_64/meta.h"
+                c, "mldsa/src/native/x86_64/meta.h"
             ),
         )
 
     synchronize_backend(
         f"dev/aarch64_{ty}/src",
-        "mldsa/native/aarch64/src",
+        "mldsa/src/native/aarch64/src",
         dry_run=dry_run,
         delete=delete,
         force_cross=force_cross,
         no_simplify=no_simplify,
-        cflags="-Imldsa/native/aarch64/src",
+        cflags="-Imldsa/src/native/aarch64/src",
     )
     synchronize_backend(
         "dev/fips202/aarch64/src",
-        "mldsa/fips202/native/aarch64/src",
+        "mldsa/src/fips202/native/aarch64/src",
         dry_run=dry_run,
         delete=delete,
         force_cross=force_cross,
         no_simplify=no_simplify,
-        cflags="-Imldsa/fips202/native/aarch64/src -march=armv8.4-a+sha3",
+        cflags="-Imldsa/src/fips202/native/aarch64/src -march=armv8.4-a+sha3",
     )
     synchronize_backend(
         "dev/fips202/aarch64",
-        "mldsa/fips202/native/aarch64",
+        "mldsa/src/fips202/native/aarch64",
         dry_run=dry_run,
         delete=delete,
         force_cross=force_cross,
         no_simplify=no_simplify,
-        cflags="-Imldsa/fips202/native/aarch64 -march=armv8.4-a+sha3",
+        cflags="-Imldsa/src/fips202/native/aarch64 -march=armv8.4-a+sha3",
     )
     synchronize_backend(
         "dev/x86_64/src",
-        "mldsa/native/x86_64/src",
+        "mldsa/src/native/x86_64/src",
         dry_run=dry_run,
         delete=delete,
         force_cross=force_cross,
@@ -1491,8 +1250,162 @@ def synchronize_backends(
         # macro.
         # This leads to duplicate endbr64 instructions causing a failure when
         # comparing the object code before and after simplification.
-        cflags="-Imldsa/native/x86_64/src/ -mavx2 -mbmi2 -msse4 -fcf-protection=none",
+        cflags="-Imldsa/src/native/x86_64/src/ -mavx2 -mbmi2 -msse4 -fcf-protection=none",
     )
+
+
+def adjust_header_guard_for_filename(content, header_file):
+
+    status_update("header guards", header_file)
+
+    content = content.split("\n")
+    exceptions = {"mldsa/mldsa_native.h": "MLD_H"}
+
+    # Use full filename as the header guard, with '/' and '.' replaced by '_'
+    guard_name = (
+        header_file.removeprefix("mldsa/src/")
+        .replace("/", "_")
+        .replace(".", "_")
+        .upper()
+    )
+    guard_name = "MLD_" + guard_name
+
+    if header_file in exceptions.keys():
+        guard_name = exceptions[header_file]
+
+    def gen_guard():
+        yield f"#ifndef {guard_name}"
+        yield f"#define {guard_name}"
+
+    def gen_footer():
+        yield f"#endif"
+        yield ""
+
+    guard = list(gen_guard())
+    footer = list(gen_footer())
+
+    # Skip over initial commentary
+    insert_at = None
+    for i, l in enumerate(content):
+        if l.strip() == "" or l.startswith(("/*", " *")):
+            continue
+        insert_at = i
+        break
+
+    i = insert_at
+    while content[i].strip() == "":
+        i += 1
+    # Check if header file has some guard -- if so, drop it
+    if content[i].strip().startswith("#if !defined") or content[i].strip().startswith(
+        "#ifndef"
+    ):
+        del content[i]
+        if content[i].strip().startswith("#define"):
+            del content[i]
+        has_guard = True
+    else:
+        has_guard = False
+    # Add standardized guard
+    content = content[:i] + guard + content[i:]
+    # Check if header has some footer
+    if (
+        has_guard is True
+        and content[-1] == ""
+        and content[-2].strip().startswith("#endif")
+    ):
+        del content[-2:]
+    # Add standardized footer
+    content = content + footer
+
+    return "\n".join(content)
+
+
+def gen_header_guard(header_file, dry_run=False):
+    with open(header_file, "r") as f:
+        content = f.read()
+    new_content = adjust_header_guard_for_filename(content, header_file)
+    update_file(header_file, new_content, dry_run=dry_run)
+
+
+def gen_header_guards(dry_run=False):
+    with ThreadPoolExecutor() as executor:
+        _ = list(
+            executor.map(
+                partial(gen_header_guard, dry_run=dry_run),
+                get_header_files(main_only=True),
+            )
+        )
+
+
+def get_markdown_files():
+    return get_files("**/*.md")
+
+
+def gen_yaml_header():
+    yield "# Copyright (c) The mldsa-native project authors"
+    yield "# SPDX-License-Identifier: Apache-2.0 OR ISC OR MIT"
+    yield ""
+
+
+class BibliographyEntry:
+    def __init__(self, raw_dict):
+        self._raw = raw_dict
+        self._usages = []
+
+    def register_usages(self, lst):
+        self._usages += lst
+
+    @property
+    def usages(self):
+        return self._usages
+
+    @property
+    def name(self):
+        return self._raw["name"]
+
+    @property
+    def short(self):
+        if "short" in self._raw.keys():
+            return self._raw["short"]
+        return self.name
+
+    @property
+    def id(self):
+        return self._raw["id"]
+
+    @property
+    def url(self):
+        return self._raw["url"]
+
+    @staticmethod
+    def full_name(name):
+        if "," not in name:
+            return name
+        surname, forename = name.split(",")
+        return forename.strip() + " " + surname.strip()
+
+    @property
+    def authors(self):
+        authors = self._raw["author"]
+        if not isinstance(authors, list):
+            authors = [authors]
+        authors = list(map(BibliographyEntry.full_name, authors))
+        return authors
+
+    @property
+    def authors_text(self):
+        authors = self._raw["author"]
+        if not isinstance(authors, list):
+            authors = [authors]
+
+        def surname(name):
+            return name.split(",")[0].strip()
+
+        if len(authors) > 1:
+            authors = ", ".join(map(surname, authors))
+        else:
+            authors = BibliographyEntry.full_name(authors[0])
+        return authors
 
 
 def gen_markdown_citations_for(filename, bibliography, dry_run=False):
@@ -1683,6 +1596,98 @@ def gen_bib_file(bibliography, dry_run=False):
     update_file("BIBLIOGRAPHY.md", "\n".join(content), dry_run=dry_run)
 
 
+def get_oqs_shared_sources(backend):
+    """Get shared source files for OQS integration"""
+    mldsa_dir = "mldsa/src/"
+
+    # add files mldsa/*
+    sources = [
+        f"mldsa/src/{f}"
+        for f in os.listdir(mldsa_dir)
+        if os.path.isfile(f"{mldsa_dir}/{f}")
+        and not f.endswith(".o")
+        and not f == "mldsa_native.h"
+    ]
+
+    if backend != "ref":
+        # add files mldsa/native/* (API definitions)
+        sources += [
+            f"mldsa/src/native/{f}"
+            for f in os.listdir(f"{mldsa_dir}/native")
+            if os.path.isfile(f"{mldsa_dir}/native/{f}")
+        ]
+    # We use a custom config
+    sources.remove("mldsa/src/config.h")
+    # Add FIPS202 glue code
+    sources += [
+        "integration/liboqs/fips202_glue.h",
+        "integration/liboqs/fips202x4_glue.h",
+    ]
+    # Add custom config
+    if backend == "ref":
+        backend = "c"
+    sources.append(f"integration/liboqs/config_{backend.lower()}.h")
+
+    return sources
+
+
+def get_oqs_native_sources(backend):
+    """Get native source files for OQS integration"""
+    return [f"mldsa/src/native/{backend}"]
+
+
+def gen_oqs_meta_file(filename, dry_run=False):
+    """Generate OQS META.yml file with updated source lists"""
+    status_update("OQS META", filename)
+
+    with open(filename, "r") as f:
+        content = f.read()
+
+    # Parse YAML while preserving structure
+    yml_data = yaml.safe_load(content)
+
+    for impl in yml_data["implementations"]:
+        name = impl["name"]
+
+        sources = get_oqs_shared_sources(name)
+
+        # NOTE: Sorting at the end causes the libOQS importer to fail.
+        # Somehow, the native directory cannot be imported too early.
+        sources.sort()
+
+        if name != "ref":
+            sources += get_oqs_native_sources(name)
+        impl["sources"] = " ".join(sources)
+
+    # Convert back to YAML string with standard copyright header
+    yaml_header = "\n".join(gen_yaml_header())
+
+    new_content = yaml.dump(
+        yml_data,
+        default_flow_style=False,
+        sort_keys=False,
+        allow_unicode=True,
+        encoding=None,
+    )
+
+    # Combine copyright header with new YAML content
+    new_content = yaml_header + new_content
+
+    update_file(filename, new_content, dry_run=dry_run)
+
+
+def gen_oqs_meta_files(dry_run=False):
+    """Generate all OQS META.yml files"""
+    meta_files = [
+        "integration/liboqs/ML-DSA-44_META.yml",
+        "integration/liboqs/ML-DSA-65_META.yml",
+        "integration/liboqs/ML-DSA-87_META.yml",
+    ]
+
+    for meta_file in meta_files:
+        gen_oqs_meta_file(meta_file, dry_run=dry_run)
+
+
 def gen_citations(dry_run=False):
     # Load bibliography
     with open("BIBLIOGRAPHY.yml", "r") as f:
@@ -1845,7 +1850,7 @@ def gen_test_configs(dry_run=False):
         metadata = yaml.safe_load(f)
 
     # Load default config
-    with open("mldsa/config.h", "r") as f:
+    with open("mldsa/src/config.h", "r") as f:
         default_config = f.read()
 
     # Generate each test config

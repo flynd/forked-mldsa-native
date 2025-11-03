@@ -6,9 +6,9 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-#include "../mldsa/fips202/fips202.h"
-#include "../mldsa/sign.h"
-#include "../mldsa/sys.h"
+#include "../mldsa/src/fips202/fips202.h"
+#include "../mldsa/src/sign.h"
+#include "../mldsa/src/sys.h"
 #include "notrandombytes/notrandombytes.h"
 
 #if defined(MLD_SYS_WINDOWS)

@@ -1263,7 +1263,10 @@ def adjust_header_guard_for_filename(content, header_file):
 
     # Use full filename as the header guard, with '/' and '.' replaced by '_'
     guard_name = (
-        header_file.removeprefix("mldsa/").replace("/", "_").replace(".", "_").upper()
+        header_file.removeprefix("mldsa/src/")
+        .replace("/", "_")
+        .replace(".", "_")
+        .upper()
     )
     guard_name = "MLD_" + guard_name
 

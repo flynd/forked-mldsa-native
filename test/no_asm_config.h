@@ -33,8 +33,8 @@
  */
 
 
-#ifndef MLD_SRC_CONFIG_H
-#define MLD_SRC_CONFIG_H
+#ifndef MLD_CONFIG_H
+#define MLD_CONFIG_H
 
 /******************************************************************************
  * Name:        MLD_CONFIG_PARAMETER_SET
@@ -453,4 +453,4 @@ static MLD_INLINE void mld_zeroize_native(void *ptr, size_t len)
 #define MLD_DEFAULT_NAMESPACE_PREFIX PQCP_MLDSA_NATIVE_MLDSA87
 #endif
 
-#endif /* !MLD_SRC_CONFIG_H */
+#endif /* !MLD_CONFIG_H */

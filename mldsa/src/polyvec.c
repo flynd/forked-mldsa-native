@@ -524,6 +524,7 @@ void mld_polyveck_sub(mld_polyveck *u, const mld_polyveck *v)
                       MLD_REDUCE32_DOMAIN_MAX);
 }
 
+#if !defined(MLD_CONFIG_NO_VERIFY_API)
 MLD_INTERNAL_API
 void mld_polyveck_shiftl(mld_polyveck *v)
 {
@@ -544,6 +545,7 @@ void mld_polyveck_shiftl(mld_polyveck *v)
 
   mld_assert_bound_2d(v->vec, MLDSA_K, MLDSA_N, 0, MLDSA_Q);
 }
+#endif /* !MLD_CONFIG_NO_VERIFY_API */
 
 MLD_INTERNAL_API
 void mld_polyveck_ntt(mld_polyveck *v)
@@ -701,6 +703,7 @@ unsigned int mld_polyveck_make_hint(mld_polyveck *h, const mld_polyveck *v0,
 }
 #endif /* !MLD_CONFIG_NO_SIGN_API */
 
+#if !defined(MLD_CONFIG_NO_VERIFY_API)
 MLD_INTERNAL_API
 void mld_polyveck_use_hint(mld_polyveck *w, const mld_polyveck *u,
                            const mld_polyveck *h)
@@ -724,6 +727,7 @@ void mld_polyveck_use_hint(mld_polyveck *w, const mld_polyveck *u,
   mld_assert_bound_2d(w->vec, MLDSA_K, MLDSA_N, 0,
                       (MLDSA_Q - 1) / (2 * MLDSA_GAMMA2));
 }
+#endif /* !MLD_CONFIG_NO_VERIFY_API */
 
 MLD_INTERNAL_API
 void mld_polyveck_pack_w1(uint8_t r[MLDSA_K * MLDSA_POLYW1_PACKEDBYTES],
@@ -808,6 +812,7 @@ void mld_polyvecl_unpack_eta(
                       MLDSA_ETA + 1);
 }
 
+#if !defined(MLD_CONFIG_NO_VERIFY_API)
 MLD_INTERNAL_API
 void mld_polyvecl_unpack_z(mld_polyvecl *z,
                            const uint8_t r[MLDSA_L * MLDSA_POLYZ_PACKEDBYTES])
@@ -821,6 +826,7 @@ void mld_polyvecl_unpack_z(mld_polyvecl *z,
   mld_assert_bound_2d(z->vec, MLDSA_L, MLDSA_N, -(MLDSA_GAMMA1 - 1),
                       MLDSA_GAMMA1 + 1);
 }
+#endif /* !MLD_CONFIG_NO_VERIFY_API */
 
 MLD_INTERNAL_API
 void mld_polyveck_unpack_eta(

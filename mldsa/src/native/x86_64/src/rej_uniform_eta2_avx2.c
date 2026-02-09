@@ -20,6 +20,7 @@
 #include "../../../common.h"
 
 #if defined(MLD_ARITH_BACKEND_X86_64_DEFAULT) && \
+    !defined(MLD_CONFIG_NO_KEYPAIR_API) && \
     !defined(MLD_CONFIG_MULTILEVEL_NO_SHARED) && \
     (defined(MLD_CONFIG_MULTILEVEL_WITH_SHARED) || MLDSA_ETA == 2)
 
@@ -143,12 +144,12 @@ unsigned int mld_rej_uniform_eta2_avx2(
   return ctr;
 }
 
-#else /* MLD_ARITH_BACKEND_X86_64_DEFAULT && !MLD_CONFIG_MULTILEVEL_NO_SHARED \
+#else /* MLD_ARITH_BACKEND_X86_64_DEFAULT && !MLD_CONFIG_NO_KEYPAIR_API && !MLD_CONFIG_MULTILEVEL_NO_SHARED \
          && (MLD_CONFIG_MULTILEVEL_WITH_SHARED || MLDSA_ETA == 2) */
 
 MLD_EMPTY_CU(avx2_rej_uniform_eta2)
 
-#endif /* !(MLD_ARITH_BACKEND_X86_64_DEFAULT && \
+#endif /* !(MLD_ARITH_BACKEND_X86_64_DEFAULT && !MLD_CONFIG_NO_KEYPAIR_API && \
           !MLD_CONFIG_MULTILEVEL_NO_SHARED &&   \
           (MLD_CONFIG_MULTILEVEL_WITH_SHARED || MLDSA_ETA == 2)) */
 

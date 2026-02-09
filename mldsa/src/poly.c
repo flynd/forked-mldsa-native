@@ -487,6 +487,7 @@ void mld_poly_pointwise_montgomery(mld_poly *c, const mld_poly *a,
   mld_poly_pointwise_montgomery_c(c, a, b);
 }
 
+#if !defined(MLD_CONFIG_NO_KEYPAIR_API)
 MLD_INTERNAL_API
 void mld_poly_power2round(mld_poly *a1, mld_poly *a0, const mld_poly *a)
 {
@@ -508,6 +509,7 @@ void mld_poly_power2round(mld_poly *a1, mld_poly *a0, const mld_poly *a)
                    (MLD_2_POW_D / 2) + 1);
   mld_assert_bound(a1->coeffs, MLDSA_N, 0, ((MLDSA_Q - 1) / MLD_2_POW_D) + 1);
 }
+#endif /* !MLD_CONFIG_NO_KEYPAIR_API */
 
 #ifndef MLD_POLY_UNIFORM_NBLOCKS
 #define MLD_POLY_UNIFORM_NBLOCKS \
@@ -724,6 +726,7 @@ void mld_poly_uniform_4x(mld_poly *vec0, mld_poly *vec1, mld_poly *vec2,
 
 #endif /* !MLD_CONFIG_SERIAL_FIPS202_ONLY && !MLD_CONFIG_REDUCE_RAM */
 
+#if !defined(MLD_CONFIG_NO_KEYPAIR_API)
 MLD_INTERNAL_API
 void mld_polyt1_pack(uint8_t r[MLDSA_POLYT1_PACKEDBYTES], const mld_poly *a)
 {
@@ -747,6 +750,7 @@ void mld_polyt1_pack(uint8_t r[MLDSA_POLYT1_PACKEDBYTES], const mld_poly *a)
     r[5 * i + 4] = (uint8_t)((a->coeffs[4 * i + 3] >> 2) & 0xFF);
   }
 }
+#endif /* !MLD_CONFIG_NO_KEYPAIR_API */
 
 MLD_INTERNAL_API
 void mld_polyt1_unpack(mld_poly *r, const uint8_t a[MLDSA_POLYT1_PACKEDBYTES])
@@ -771,6 +775,7 @@ void mld_polyt1_unpack(mld_poly *r, const uint8_t a[MLDSA_POLYT1_PACKEDBYTES])
   mld_assert_bound(r->coeffs, MLDSA_N, 0, 1 << 10);
 }
 
+#if !defined(MLD_CONFIG_NO_KEYPAIR_API)
 MLD_INTERNAL_API
 void mld_polyt0_pack(uint8_t r[MLDSA_POLYT0_PACKEDBYTES], const mld_poly *a)
 {
@@ -817,6 +822,7 @@ void mld_polyt0_pack(uint8_t r[MLDSA_POLYT0_PACKEDBYTES], const mld_poly *a)
     r[13 * i + 12] = (uint8_t)((t[7] >> 5) & 0xFF);
   }
 }
+#endif /* !MLD_CONFIG_NO_KEYPAIR_API */
 
 MLD_INTERNAL_API
 void mld_polyt0_unpack(mld_poly *r, const uint8_t a[MLDSA_POLYT0_PACKEDBYTES])

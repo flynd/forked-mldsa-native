@@ -181,6 +181,7 @@ void mld_poly_use_hint(mld_poly *b, const mld_poly *a, const mld_poly *h)
   mld_poly_use_hint_c(b, a, h);
 }
 
+#if !defined(MLD_CONFIG_NO_KEYPAIR_API)
 /*************************************************
  * Name:        mld_rej_eta
  *
@@ -483,6 +484,7 @@ void mld_poly_uniform_eta(mld_poly *r, const uint8_t seed[MLDSA_CRHBYTES],
   mld_zeroize(extseed, sizeof(extseed));
 }
 #endif /* MLD_CONFIG_SERIAL_FIPS202_ONLY */
+#endif /* !MLD_CONFIG_NO_KEYPAIR_API */
 
 #define MLD_POLY_UNIFORM_GAMMA1_NBLOCKS                       \
   ((MLDSA_POLYZ_PACKEDBYTES + MLD_STREAM256_BLOCKBYTES - 1) / \
@@ -650,6 +652,7 @@ void mld_poly_challenge(mld_poly *c, const uint8_t seed[MLDSA_CTILDEBYTES])
   mld_zeroize(&signs, sizeof(signs));
 }
 
+#if !defined(MLD_CONFIG_NO_KEYPAIR_API)
 MLD_INTERNAL_API
 void mld_polyeta_pack(uint8_t r[MLDSA_POLYETA_PACKEDBYTES], const mld_poly *a)
 {
@@ -695,6 +698,7 @@ void mld_polyeta_pack(uint8_t r[MLDSA_POLYETA_PACKEDBYTES], const mld_poly *a)
 #error "Invalid value of MLDSA_ETA"
 #endif /* MLDSA_ETA != 2 && MLDSA_ETA != 4 */
 }
+#endif /* !MLD_CONFIG_NO_KEYPAIR_API */
 
 void mld_polyeta_unpack(mld_poly *r, const uint8_t a[MLDSA_POLYETA_PACKEDBYTES])
 {

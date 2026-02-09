@@ -247,6 +247,7 @@ void mld_polyvec_matrix_pointwise_montgomery(mld_polyveck *t, mld_polymat *mat,
 /**************************************************************/
 /************ Vectors of polynomials of length MLDSA_L **************/
 /**************************************************************/
+#if !defined(MLD_CONFIG_NO_SIGN_API)
 MLD_INTERNAL_API
 void mld_polyvecl_uniform_gamma1(mld_polyvecl *v,
                                  const uint8_t seed[MLDSA_CRHBYTES],
@@ -289,6 +290,7 @@ void mld_polyvecl_uniform_gamma1(mld_polyvecl *v,
   mld_assert_bound_2d(v->vec, MLDSA_L, MLDSA_N, -(MLDSA_GAMMA1 - 1),
                       MLDSA_GAMMA1 + 1);
 }
+#endif /* !MLD_CONFIG_NO_SIGN_API */
 
 MLD_INTERNAL_API
 void mld_polyvecl_ntt(mld_polyvecl *v)
@@ -655,6 +657,7 @@ void mld_polyveck_power2round(mld_polyveck *v1, mld_polyveck *v0,
 }
 #endif /* !MLD_CONFIG_NO_KEYPAIR_API */
 
+#if !defined(MLD_CONFIG_NO_SIGN_API)
 MLD_INTERNAL_API
 void mld_polyveck_decompose(mld_polyveck *v1, mld_polyveck *v0)
 {
@@ -701,6 +704,7 @@ unsigned int mld_polyveck_make_hint(mld_polyveck *h, const mld_polyveck *v0,
   mld_assert_bound_2d(h->vec, MLDSA_K, MLDSA_N, 0, 2);
   return s;
 }
+#endif /* !MLD_CONFIG_NO_SIGN_API */
 
 MLD_INTERNAL_API
 void mld_polyveck_use_hint(mld_polyveck *w, const mld_polyveck *u,

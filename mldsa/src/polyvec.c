@@ -506,6 +506,7 @@ void mld_polyveck_add(mld_polyveck *u, const mld_polyveck *v)
                       MLD_REDUCE32_DOMAIN_MAX);
 }
 
+#if !defined(MLD_CONFIG_NO_SIGN_API) || !defined(MLD_CONFIG_NO_VERIFY_API)
 MLD_INTERNAL_API
 void mld_polyveck_sub(mld_polyveck *u, const mld_polyveck *v)
 {
@@ -528,6 +529,7 @@ void mld_polyveck_sub(mld_polyveck *u, const mld_polyveck *v)
   mld_assert_bound_2d(u->vec, MLDSA_K, MLDSA_N, INT32_MIN,
                       MLD_REDUCE32_DOMAIN_MAX);
 }
+#endif /* !MLD_CONFIG_NO_SIGN_API || !MLD_CONFIG_NO_VERIFY_API */
 
 #if !defined(MLD_CONFIG_NO_VERIFY_API)
 MLD_INTERNAL_API
@@ -552,6 +554,7 @@ void mld_polyveck_shiftl(mld_polyveck *v)
 }
 #endif /* !MLD_CONFIG_NO_VERIFY_API */
 
+#if !defined(MLD_CONFIG_NO_SIGN_API) || !defined(MLD_CONFIG_NO_VERIFY_API)
 MLD_INTERNAL_API
 void mld_polyveck_ntt(mld_polyveck *v)
 {
@@ -569,6 +572,7 @@ void mld_polyveck_ntt(mld_polyveck *v)
   }
   mld_assert_abs_bound_2d(v->vec, MLDSA_K, MLDSA_N, MLD_NTT_BOUND);
 }
+#endif /* !MLD_CONFIG_NO_SIGN_API || !MLD_CONFIG_NO_VERIFY_API */
 
 MLD_INTERNAL_API
 void mld_polyveck_invntt_tomont(mld_polyveck *v)
@@ -589,6 +593,7 @@ void mld_polyveck_invntt_tomont(mld_polyveck *v)
   mld_assert_abs_bound_2d(v->vec, MLDSA_K, MLDSA_N, MLD_INTT_BOUND);
 }
 
+#if !defined(MLD_CONFIG_NO_SIGN_API) || !defined(MLD_CONFIG_NO_VERIFY_API)
 MLD_INTERNAL_API
 void mld_polyveck_pointwise_poly_montgomery(mld_polyveck *r, const mld_poly *a,
                                             const mld_polyveck *v)
@@ -607,6 +612,7 @@ void mld_polyveck_pointwise_poly_montgomery(mld_polyveck *r, const mld_poly *a,
   }
   mld_assert_abs_bound_2d(r->vec, MLDSA_K, MLDSA_N, MLDSA_Q);
 }
+#endif /* !MLD_CONFIG_NO_SIGN_API || !MLD_CONFIG_NO_VERIFY_API */
 
 MLD_INTERNAL_API
 uint32_t mld_polyveck_chknorm(const mld_polyveck *v, int32_t bound)
@@ -734,6 +740,7 @@ void mld_polyveck_use_hint(mld_polyveck *w, const mld_polyveck *u,
 }
 #endif /* !MLD_CONFIG_NO_VERIFY_API */
 
+#if !defined(MLD_CONFIG_NO_SIGN_API) || !defined(MLD_CONFIG_NO_VERIFY_API)
 MLD_INTERNAL_API
 void mld_polyveck_pack_w1(uint8_t r[MLDSA_K * MLDSA_POLYW1_PACKEDBYTES],
                           const mld_polyveck *w1)
@@ -751,6 +758,7 @@ void mld_polyveck_pack_w1(uint8_t r[MLDSA_K * MLDSA_POLYW1_PACKEDBYTES],
     mld_polyw1_pack(&r[i * MLDSA_POLYW1_PACKEDBYTES], &w1->vec[i]);
   }
 }
+#endif /* !MLD_CONFIG_NO_SIGN_API || !MLD_CONFIG_NO_VERIFY_API */
 
 #if !defined(MLD_CONFIG_NO_KEYPAIR_API)
 MLD_INTERNAL_API

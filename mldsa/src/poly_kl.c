@@ -578,6 +578,7 @@ void mld_poly_uniform_gamma1_4x(mld_poly *r0, mld_poly *r1, mld_poly *r2,
 #endif /* !MLD_CONFIG_SERIAL_FIPS202_ONLY */
 #endif /* !MLD_CONFIG_NO_SIGN_API */
 
+#if !defined(MLD_CONFIG_NO_SIGN_API) || !defined(MLD_CONFIG_NO_VERIFY_API)
 MLD_INTERNAL_API
 void mld_poly_challenge(mld_poly *c, const uint8_t seed[MLDSA_CTILDEBYTES])
 {
@@ -657,6 +658,7 @@ void mld_poly_challenge(mld_poly *c, const uint8_t seed[MLDSA_CTILDEBYTES])
   mld_zeroize(buf, sizeof(buf));
   mld_zeroize(&signs, sizeof(signs));
 }
+#endif /* !MLD_CONFIG_NO_SIGN_API || !MLD_CONFIG_NO_VERIFY_API */
 
 #if !defined(MLD_CONFIG_NO_KEYPAIR_API)
 MLD_INTERNAL_API
@@ -806,6 +808,7 @@ void mld_polyz_pack(uint8_t r[MLDSA_POLYZ_PACKEDBYTES], const mld_poly *a)
 }
 #endif /* !MLD_CONFIG_NO_SIGN_API */
 
+#if !defined(MLD_CONFIG_NO_SIGN_API) || !defined(MLD_CONFIG_NO_VERIFY_API)
 MLD_STATIC_TESTABLE void mld_polyz_unpack_c(
     mld_poly *r, const uint8_t a[MLDSA_POLYZ_PACKEDBYTES])
 __contract__(
@@ -927,6 +930,7 @@ void mld_polyw1_pack(uint8_t r[MLDSA_POLYW1_PACKEDBYTES], const mld_poly *a)
   }
 #endif /* MLD_CONFIG_PARAMETER_SET != 44 */
 }
+#endif /* !MLD_CONFIG_NO_SIGN_API || !MLD_CONFIG_NO_VERIFY_API */
 
 /* To facilitate single-compilation-unit (SCU) builds, undefine all macros. */
 

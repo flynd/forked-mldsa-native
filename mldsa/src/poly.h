@@ -86,6 +86,7 @@ __contract__(
   ensures(forall(k4, 0, MLDSA_N, r->coeffs[k4] >= INT32_MIN))
 );
 
+#if !defined(MLD_CONFIG_NO_SIGN_API) || !defined(MLD_CONFIG_NO_VERIFY_API)
 #define mld_poly_sub MLD_NAMESPACE(poly_sub)
 /*************************************************
  * Name:        mld_poly_sub
@@ -111,6 +112,7 @@ __contract__(
   assigns(memory_slice(r, sizeof(mld_poly)))
   ensures(array_bound(r->coeffs, 0, MLDSA_N, INT32_MIN, MLD_REDUCE32_DOMAIN_MAX))
 );
+#endif /* !MLD_CONFIG_NO_SIGN_API || !MLD_CONFIG_NO_VERIFY_API */
 
 #if !defined(MLD_CONFIG_NO_VERIFY_API)
 #define mld_poly_shiftl MLD_NAMESPACE(poly_shiftl)
@@ -171,6 +173,7 @@ __contract__(
   ensures(array_abs_bound(a->coeffs, 0, MLDSA_N, MLD_INTT_BOUND))
 );
 
+#if !defined(MLD_CONFIG_NO_SIGN_API) || !defined(MLD_CONFIG_NO_VERIFY_API)
 #define mld_poly_pointwise_montgomery MLD_NAMESPACE(poly_pointwise_montgomery)
 /*************************************************
  * Name:        mld_poly_pointwise_montgomery
@@ -195,6 +198,7 @@ __contract__(
   assigns(memory_slice(c, sizeof(mld_poly)))
   ensures(array_abs_bound(c->coeffs, 0, MLDSA_N, MLDSA_Q))
 );
+#endif /* !MLD_CONFIG_NO_SIGN_API || !MLD_CONFIG_NO_VERIFY_API */
 
 #if !defined(MLD_CONFIG_NO_KEYPAIR_API)
 #define mld_poly_power2round MLD_NAMESPACE(poly_power2round)

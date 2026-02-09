@@ -975,6 +975,7 @@ int mld_sign(uint8_t *sm, size_t *smlen, const uint8_t *m, size_t mlen,
 #endif /* !MLD_CONFIG_NO_RANDOMIZED_API */
 #endif /* !MLD_CONFIG_NO_SIGN_API */
 
+#if !defined(MLD_CONFIG_NO_VERIFY_API)
 MLD_MUST_CHECK_RETURN_VALUE
 MLD_EXTERNAL_API
 int mld_sign_verify_internal(const uint8_t *sig, size_t siglen,
@@ -1186,6 +1187,7 @@ cleanup:
 
   return ret;
 }
+#endif /* !MLD_CONFIG_NO_VERIFY_API */
 
 #if !defined(MLD_CONFIG_NO_SIGN_API)
 MLD_MUST_CHECK_RETURN_VALUE
@@ -1230,6 +1232,7 @@ cleanup:
 }
 #endif /* !MLD_CONFIG_NO_SIGN_API */
 
+#if !defined(MLD_CONFIG_NO_VERIFY_API)
 MLD_MUST_CHECK_RETURN_VALUE
 MLD_EXTERNAL_API
 int mld_sign_verify_pre_hash_internal(
@@ -1258,6 +1261,7 @@ cleanup:
   mld_zeroize(pre, sizeof(pre));
   return ret;
 }
+#endif /* !MLD_CONFIG_NO_VERIFY_API */
 
 #if !defined(MLD_CONFIG_NO_SIGN_API)
 MLD_MUST_CHECK_RETURN_VALUE
@@ -1281,6 +1285,7 @@ int mld_sign_signature_pre_hash_shake256(
 }
 #endif /* !MLD_CONFIG_NO_SIGN_API */
 
+#if !defined(MLD_CONFIG_NO_VERIFY_API)
 MLD_MUST_CHECK_RETURN_VALUE
 MLD_EXTERNAL_API
 int mld_sign_verify_pre_hash_shake256(
@@ -1299,7 +1304,7 @@ int mld_sign_verify_pre_hash_shake256(
   mld_zeroize(ph, sizeof(ph));
   return ret;
 }
-
+#endif /* !MLD_CONFIG_NO_VERIFY_API */
 
 #define MLD_PRE_HASH_OID_LEN 11
 

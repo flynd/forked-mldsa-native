@@ -357,6 +357,7 @@ __contract__(
 );
 #endif /* !MLD_CONFIG_NO_SIGN_API */
 
+#if !defined(MLD_CONFIG_NO_VERIFY_API)
 /*************************************************
  * Name:        mld_sign_verify_internal
  *
@@ -515,6 +516,7 @@ __contract__(
   assigns(memory_slice(mlen, sizeof(size_t)))
   ensures(return_value == 0 || return_value == MLD_ERR_FAIL || return_value == MLD_ERR_OUT_OF_MEMORY)
 );
+#endif /* !MLD_CONFIG_NO_VERIFY_API */
 
 #if !defined(MLD_CONFIG_NO_SIGN_API)
 /*************************************************
@@ -575,6 +577,7 @@ __contract__(
 );
 #endif /* !MLD_CONFIG_NO_SIGN_API */
 
+#if !defined(MLD_CONFIG_NO_VERIFY_API)
 /*************************************************
  * Name:        mld_sign_verify_pre_hash_internal
  *
@@ -623,6 +626,7 @@ __contract__(
   requires(memory_no_alias(pk, MLDSA_CRYPTO_PUBLICKEYBYTES))
   ensures(return_value == 0 || return_value == MLD_ERR_FAIL || return_value == MLD_ERR_OUT_OF_MEMORY)
 );
+#endif /* !MLD_CONFIG_NO_VERIFY_API */
 
 #if !defined(MLD_CONFIG_NO_SIGN_API)
 /*************************************************
@@ -675,6 +679,7 @@ __contract__(
 );
 #endif /* !MLD_CONFIG_NO_SIGN_API */
 
+#if !defined(MLD_CONFIG_NO_VERIFY_API)
 /*************************************************
  * Name:        mld_sign_verify_pre_hash_shake256
  *
@@ -716,6 +721,7 @@ __contract__(
   requires(memory_no_alias(pk, MLDSA_CRYPTO_PUBLICKEYBYTES))
   ensures(return_value == 0 || return_value == MLD_ERR_FAIL || return_value == MLD_ERR_OUT_OF_MEMORY)
 );
+#endif /* !MLD_CONFIG_NO_VERIFY_API */
 
 /* Maximum formatted domain separation message length:
  * - Pure ML-DSA: 0x00 || ctxlen || ctx (max 255)

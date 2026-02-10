@@ -127,6 +127,7 @@ __contract__(
           return_value == MLD_ERR_OUT_OF_MEMORY || return_value == MLD_ERR_RNG_FAIL)
 );
 
+#if !defined(MLD_CONFIG_INTERNAL_API_ONLY)
 /*************************************************
  * Name:        mld_sign_keypair
  *
@@ -160,6 +161,7 @@ __contract__(
   ensures(return_value == 0 || return_value == MLD_ERR_FAIL ||
           return_value == MLD_ERR_OUT_OF_MEMORY || return_value == MLD_ERR_RNG_FAIL)
 );
+#endif /* !MLD_CONFIG_INTERNAL_API_ONLY */
 #endif /* !MLD_CONFIG_NO_KEYPAIR_API */
 
 #if !defined(MLD_CONFIG_NO_SIGN_API)
@@ -221,6 +223,7 @@ __contract__(
   ensures(return_value != 0 ==> *siglen == 0)
 );
 
+#if !defined(MLD_CONFIG_INTERNAL_API_ONLY)
 /*************************************************
  * Name:        mld_sign_signature
  *
@@ -355,6 +358,7 @@ __contract__(
            || return_value == MLD_ERR_OUT_OF_MEMORY
            || return_value == MLD_ERR_RNG_FAIL))
 );
+#endif /* !MLD_CONFIG_INTERNAL_API_ONLY */
 #endif /* !MLD_CONFIG_NO_SIGN_API */
 
 #if !defined(MLD_CONFIG_NO_VERIFY_API)
@@ -402,6 +406,7 @@ __contract__(
   ensures(return_value == 0 || return_value == MLD_ERR_FAIL || return_value == MLD_ERR_OUT_OF_MEMORY)
 );
 
+#if !defined(MLD_CONFIG_INTERNAL_API_ONLY)
 /*************************************************
  * Name:        mld_sign_verify
  *
@@ -516,8 +521,10 @@ __contract__(
   assigns(memory_slice(mlen, sizeof(size_t)))
   ensures(return_value == 0 || return_value == MLD_ERR_FAIL || return_value == MLD_ERR_OUT_OF_MEMORY)
 );
+#endif /* !MLD_CONFIG_INTERNAL_API_ONLY */
 #endif /* !MLD_CONFIG_NO_VERIFY_API */
 
+#if !defined(MLD_CONFIG_INTERNAL_API_ONLY)
 #if !defined(MLD_CONFIG_NO_SIGN_API)
 /*************************************************
  * Name:        mld_sign_signature_pre_hash_internal
@@ -822,5 +829,6 @@ __contract__(
   ensures(return_value == 0 || return_value == MLD_ERR_FAIL || return_value == MLD_ERR_OUT_OF_MEMORY)
 );
 #endif /* !MLD_CONFIG_NO_KEYPAIR_API */
+#endif /* !MLD_CONFIG_INTERNAL_API_ONLY */
 
 #endif /* !MLD_SIGN_H */
